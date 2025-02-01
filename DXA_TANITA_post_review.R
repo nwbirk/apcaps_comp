@@ -412,6 +412,84 @@ train_test_perf <- function(predictions_train, predictions_test, outcome, sex){
   }
 }
 
+train_test_perf_age <- function(predictions_train, predictions_test, outcome, sex, age ){
+  if(sex == 'male'){
+    if(age == "<40"){
+      train_set = dxa_train_male[dxa_train_male$ha1dv_age < 40, outcome]
+      test_set = dxa_test_male[dxa_test_male$ha1dv_age < 40, outcome]
+      
+      predictions_train = predictions_train[dxa_train_male$ha1dv_age < 40]
+      predictions_test = predictions_test[dxa_test_male$ha1dv_age < 40]
+      
+      a <- rmse(train_set, predictions_train)
+      b <- mae(train_set, predictions_train)
+      c <- mape(train_set, predictions_train)
+      d <- cor(train_set, predictions_train)^2
+      e <- rmse(test_set, predictions_test)
+      f <- mae(test_set, predictions_test)
+      g <- mape(test_set, predictions_test)
+      h <- cor(test_set, predictions_test)^2
+    } else if (age == "40+"){
+      train_set = dxa_train_male[dxa_train_male$ha1dv_age >= 40, outcome]
+      test_set = dxa_test_male[dxa_test_male$ha1dv_age >= 40, outcome]
+      
+      predictions_train = predictions_train[dxa_train_male$ha1dv_age >= 40]
+      predictions_test = predictions_test[dxa_test_male$ha1dv_age >= 40]
+      
+      a <- rmse(train_set, predictions_train)
+      b <- mae(train_set, predictions_train)
+      c <- mape(train_set, predictions_train)
+      d <- cor(train_set, predictions_train)^2
+      e <- rmse(test_set, predictions_test)
+      f <- mae(test_set, predictions_test)
+      g <- mape(test_set, predictions_test)
+      h <- cor(test_set, predictions_test)^2
+    }
+    
+    results <- c(a,b,c,d,e,f, g, h)
+    names(results) <- c('RMSE_train', 'MAE_train', 'MAPE_train', 'R2_train', 'RMSE_test', 'MAE_test', 'MAPE_test', 'R2_test')
+    return(results)
+    
+  }
+  else if(sex == 'female'){
+    if (age == "<40"){
+      train_set = dxa_train_female[dxa_train_female$ha1dv_age < 40, outcome]
+      test_set = dxa_test_female[dxa_test_female$ha1dv_age < 40, outcome]
+      
+      predictions_train = predictions_train[dxa_train_female$ha1dv_age < 40]
+      predictions_test = predictions_test[dxa_test_female$ha1dv_age < 40]
+      
+      a <- rmse(train_set, predictions_train)
+      b <- mae(train_set, predictions_train)
+      c <- mape(train_set, predictions_train)
+      d <- cor(train_set, predictions_train)^2
+      e <- rmse(test_set, predictions_test)
+      f <- mae(test_set, predictions_test)
+      g <- mape(test_set, predictions_test)
+      h <- cor(test_set, predictions_test)^2
+    } else if (age == "40+"){
+      train_set = dxa_train_female[dxa_train_female$ha1dv_age >= 40, outcome]
+      test_set = dxa_test_female[dxa_test_female$ha1dv_age >= 40, outcome]
+      
+      predictions_train = predictions_train[dxa_train_female$ha1dv_age >= 40]
+      predictions_test = predictions_test[dxa_test_female$ha1dv_age >= 40]
+      
+      a <- rmse(train_set, predictions_train)
+      b <- mae(train_set, predictions_train)
+      c <- mape(train_set, predictions_train)
+      d <- cor(train_set, predictions_train)^2
+      e <- rmse(test_set, predictions_test)
+      f <- mae(test_set, predictions_test)
+      g <- mape(test_set, predictions_test)
+      h <- cor(test_set, predictions_test)^2
+    }
+    
+    results <- c(a,b,c,d,e,f, g, h)
+    names(results) <- c('RMSE_train', 'MAE_train', 'MAPE_train', 'R2_train', 'RMSE_test', 'MAE_test', 'MAPE_test', 'R2_test')
+    return(results)
+  }
+}
+
 
 # LASSO
 
@@ -563,22 +641,89 @@ totalfatresults <- rbind(tfm1, tfm2, tfm3, tfm4, tfm5, tfm6, tfm7, tfm8)
 # plots
 p1 = blandr.draw(predict_enet(tot_fat_male_lasso, dxa_test_male), 
                  dxa_test_male[,'ha1q34_9atotal_fat'], lowest_y_axis = -10000, highest_y_axis = 10000,
-                 plotTitle = "Total fat mass (g), male, Full LASSO", ciShading = FALSE, ciDisplay = FALSE) 
+                 plotTitle = "Total fat mass (g), male, Full LASSO", ciShading = FALSE, ciDisplay = FALSE) + geom_smooth(method = "lm")
 p2 = blandr.draw(predict_enet(tot_fat_female_lasso, dxa_test_female), 
                  dxa_test_female[,'ha1q34_9atotal_fat'], lowest_y_axis = -10000, highest_y_axis = 10000,
-                 plotTitle = "Total fat mass (g), female, Full LASSO", ciShading = FALSE, ciDisplay = FALSE) 
+                 plotTitle = "Total fat mass (g), female, Full LASSO", ciShading = FALSE, ciDisplay = FALSE) + geom_smooth(method = "lm")
 
 
 p3 = blandr.draw(1000*dxa_test_male[,'ha1q37_5ii_tbf_mass'], 
                  dxa_test_male[,'ha1q34_9atotal_fat'], lowest_y_axis = -10000, highest_y_axis = 10000,
-                 plotTitle = "Total fat mass (g), male, Tanita", ciShading = FALSE, ciDisplay = FALSE) 
+                 plotTitle = "Total fat mass (g), male, Tanita", ciShading = FALSE, ciDisplay = FALSE) + geom_smooth(method = "lm")
 p4 = blandr.draw(1000*dxa_test_female[,'ha1q37_5ii_tbf_mass'], 
                  dxa_test_female[,'ha1q34_9atotal_fat'], lowest_y_axis = -10000, highest_y_axis = 10000,
-                 plotTitle = "Total fat mass (g), female, Tanita", ciShading = FALSE, ciDisplay = FALSE) 
+                 plotTitle = "Total fat mass (g), female, Tanita", ciShading = FALSE, ciDisplay = FALSE) + geom_smooth(method = "lm")
 
-# Display 
+# Display / save
+jpeg("totalfatmale.jpg", width = 660, height = "411")
 grid.arrange(p1, p3, ncol = 2)
+dev.off()
+jpeg("totalfatfemale.jpg", width = 660, height = "411")
 grid.arrange(p2, p4, ncol = 2)
+dev.off()
+
+
+# Extra info - separated by age
+
+# Performance
+tfm1a <- train_test_perf_age(1000*dxa_train_male[,'ha1q37_5ii_tbf_mass'], 
+                        1000*dxa_test_male[,'ha1q37_5ii_tbf_mass'], 
+                        'ha1q34_9atotal_fat', 'male', age = "<40")
+tfm2a <- train_test_perf_age(predict_enet(tot_fat_male_lasso, dxa_train_male), 
+                        predict_enet(tot_fat_male_lasso, dxa_test_male),
+                        'ha1q34_9atotal_fat', 'male', age = "<40")
+tfm3a <- train_test_perf_age(predict(tot_fat_male_rf, dxa_train_male)$predictions, 
+                        predict(tot_fat_male_rf, dxa_test_male)$predictions,
+                        'ha1q34_9atotal_fat', 'male', age = "<40")
+tfm4a <- train_test_perf_age(predict(tot_fat_male_xgb, dxa_train_male), 
+                        predict(tot_fat_male_xgb, dxa_test_male),
+                        'ha1q34_9atotal_fat', 'male', age = "<40")
+
+
+tfm5a <- train_test_perf_age(1000*dxa_train_female[,'ha1q37_5ii_tbf_mass'], 
+                        1000*dxa_test_female[,'ha1q37_5ii_tbf_mass'], 
+                        'ha1q34_9atotal_fat', 'female', age = "<40")
+tfm6a <- train_test_perf_age(predict_enet(tot_fat_female_lasso, dxa_train_female), 
+                        predict_enet(tot_fat_female_lasso, dxa_test_female),
+                        'ha1q34_9atotal_fat', 'female', age = "<40")
+tfm7a <- train_test_perf_age(predict(tot_fat_female_rf, dxa_train_female)$predictions, 
+                        predict(tot_fat_female_rf, dxa_test_female)$predictions,
+                        'ha1q34_9atotal_fat', 'female', age = "<40")
+tfm8a <- train_test_perf_age(predict(tot_fat_female_xgb, dxa_train_female), 
+                        predict(tot_fat_female_xgb, dxa_test_female),
+                        'ha1q34_9atotal_fat', 'female', age = "<40")
+
+
+tfm1b <- train_test_perf_age(1000*dxa_train_male[,'ha1q37_5ii_tbf_mass'], 
+                         1000*dxa_test_male[,'ha1q37_5ii_tbf_mass'], 
+                         'ha1q34_9atotal_fat', 'male', age = "40+")
+tfm2b <- train_test_perf_age(predict_enet(tot_fat_male_lasso, dxa_train_male), 
+                         predict_enet(tot_fat_male_lasso, dxa_test_male),
+                         'ha1q34_9atotal_fat', 'male', age = "40+")
+tfm3b <- train_test_perf_age(predict(tot_fat_male_rf, dxa_train_male)$predictions, 
+                         predict(tot_fat_male_rf, dxa_test_male)$predictions,
+                         'ha1q34_9atotal_fat', 'male', age = "40+")
+tfm4b <- train_test_perf_age(predict(tot_fat_male_xgb, dxa_train_male), 
+                         predict(tot_fat_male_xgb, dxa_test_male),
+                         'ha1q34_9atotal_fat', 'male', age = "40+")
+
+
+tfm5b <- train_test_perf_age(1000*dxa_train_female[,'ha1q37_5ii_tbf_mass'], 
+                         1000*dxa_test_female[,'ha1q37_5ii_tbf_mass'], 
+                         'ha1q34_9atotal_fat', 'female', age = "40+")
+tfm6b <- train_test_perf_age(predict_enet(tot_fat_female_lasso, dxa_train_female), 
+                         predict_enet(tot_fat_female_lasso, dxa_test_female),
+                         'ha1q34_9atotal_fat', 'female', age = "40+")
+tfm7b <- train_test_perf_age(predict(tot_fat_female_rf, dxa_train_female)$predictions, 
+                         predict(tot_fat_female_rf, dxa_test_female)$predictions,
+                         'ha1q34_9atotal_fat', 'female', age = "40+")
+tfm8b <- train_test_perf_age(predict(tot_fat_female_xgb, dxa_train_female), 
+                         predict(tot_fat_female_xgb, dxa_test_female),
+                         'ha1q34_9atotal_fat', 'female', age = "40+")
+
+
+totalfatresults_u40 <- rbind(tfm1a, tfm2a, tfm3a, tfm4a, tfm5a, tfm6a, tfm7a, tfm8a)
+totalfatresults_o40 <- rbind(tfm1b, tfm2b, tfm3b, tfm4b, tfm5b, tfm6b, tfm7b, tfm8b)
 
 
 # Outcome = Total body lean mass, ha1q34_9btotal_lean
@@ -626,23 +771,28 @@ t.test(predict_enet(tot_lean_female_lasso, dxa_test_female), dxa_test_female$ha1
 # plots
 p1 = blandr.draw(predict_enet(tot_lean_male_lasso, dxa_test_male), 
                  dxa_test_male[,'ha1q34_9btotal_lean'],
-                 plotTitle = "Total lean mass (g), male, Full LASSO", ciShading = FALSE, ciDisplay = FALSE) 
+                 plotTitle = "Total lean mass (g), male, Full LASSO", ciShading = FALSE, ciDisplay = FALSE) + geom_smooth(method = "lm")
 p2 = blandr.draw(predict_enet(tot_lean_female_lasso, dxa_test_female), 
                  dxa_test_female[,'ha1q34_9btotal_lean'],
-                 plotTitle = "Total lean mass (g), female, Full LASSO", ciShading = FALSE, ciDisplay = FALSE) 
+                 plotTitle = "Total lean mass (g), female, Full LASSO", ciShading = FALSE, ciDisplay = FALSE) + geom_smooth(method = "lm")
 
 
 p3 = blandr.draw(1000*dxa_test_male[,'ha1q37_5iii_tbf_free_mass'], 
                  dxa_test_male[,'ha1q34_9btotal_lean'],
-                 plotTitle = "Total lean mass (g), male, Tanita", ciShading = FALSE, ciDisplay = FALSE) 
+                 plotTitle = "Total lean mass (g), male, Tanita", ciShading = FALSE, ciDisplay = FALSE) + geom_smooth(method = "lm")
 p4 = blandr.draw(1000*dxa_test_female[,'ha1q37_5iii_tbf_free_mass'], 
                  dxa_test_female[,'ha1q34_9btotal_lean'],
-                 plotTitle = "Total lean mass (g), female, Tanita", ciShading = FALSE, ciDisplay = FALSE) 
+                 plotTitle = "Total lean mass (g), female, Tanita", ciShading = FALSE, ciDisplay = FALSE) + geom_smooth(method = "lm")
 
 
 # Display 
+jpeg("totalleanmale.jpg", width = 660, height = "411")
 grid.arrange(p1, p3, ncol = 2)
+dev.off()
+
+jpeg("totalleanfemale.jpg", width = 660, height = "411")
 grid.arrange(p2, p4, ncol = 2)
+dev.off()
 
 # Further, can include comparison to Bharati's equations here (Table 2)
 tlm9 <- train_test_perf((as.numeric(10.385 - (0.005*dxa_train_male$ha1dv_age) + (0.103*dxa_train_male$height/10)+ (0.680*dxa_train_male$ha1q37_2_weight) + (0.288*dxa_train_male$arm_circ/10) + (0.130*dxa_train_male$calf_circ/10) - (0.183*dxa_train_male$hip_circ/10) - (5.278*dxa_train_male$log_skin))*1000), 
@@ -658,12 +808,72 @@ totalleanresults <- rbind(tlm1, tlm2, tlm3, tlm4, tlm5,
 
 blandr.draw(as.numeric(10.385 - (0.005*dxa_test_male$ha1dv_age) + (0.103*dxa_test_male$height/10)+ (0.680*dxa_test_male$ha1q37_2_weight) + (0.288*dxa_test_male$arm_circ/10) + (0.130*dxa_test_male$calf_circ/10) - (0.183*dxa_test_male$hip_circ/10) - (5.278*dxa_test_male$log_skin))*1000, 
             dxa_test_male[,'ha1q34_9btotal_lean'],
-            plotTitle = "Total lean mass (g) predictions, Bharati, male", ciShading = FALSE, ciDisplay = FALSE) 
+            plotTitle = "Total lean mass (g) predictions, Bharati, male", ciShading = FALSE, ciDisplay = FALSE) + geom_smooth(method = "lm")
 
 blandr.draw(as.numeric(10.632 - (0.009*dxa_test_female$ha1dv_age) + (0.102*dxa_test_female$height/10)+ (0.592*dxa_test_female$ha1q37_2_weight) + (0.055*dxa_test_female$arm_circ/10) + (0.043*dxa_test_female$calf_circ/10) - (0.158*dxa_test_female$hip_circ/10) - (3.174*dxa_test_female$log_skin))*1000, 
             dxa_test_female[,'ha1q34_9btotal_lean'],
-            plotTitle = "Total lean mass (g) predictions, Bharati, female", ciShading = FALSE, ciDisplay = FALSE) 
+            plotTitle = "Total lean mass (g) predictions, Bharati, female", ciShading = FALSE, ciDisplay = FALSE) + geom_smooth(method = "lm")
 
+
+
+# Age-stratified
+tlm1a <- train_test_perf_age(1000*dxa_train_male[,'ha1q37_5iii_tbf_free_mass'], 
+                             1000*dxa_test_male[,'ha1q37_5iii_tbf_free_mass'], 
+                             'ha1q34_9btotal_lean', 'male', age = "<40")
+tlm2a <- train_test_perf_age(predict_enet(tot_lean_male_lasso, dxa_train_male), 
+                             predict_enet(tot_lean_male_lasso, dxa_test_male),
+                             'ha1q34_9btotal_lean', 'male', age = "<40")
+tlm3a <- train_test_perf_age(predict(tot_lean_male_rf, dxa_train_male)$predictions, 
+                             predict(tot_lean_male_rf, dxa_test_male)$predictions,
+                             'ha1q34_9btotal_lean', 'male', age = "<40")
+tlm4a <- train_test_perf_age(predict(tot_lean_male_xgb, dxa_train_male), 
+                             predict(tot_lean_male_xgb, dxa_test_male),
+                             'ha1q34_9btotal_lean', 'male', age = "<40")
+
+tlm5a <- train_test_perf_age(1000*dxa_train_female[,'ha1q37_5iii_tbf_free_mass'], 
+                             1000*dxa_test_female[,'ha1q37_5iii_tbf_free_mass'], 
+                             'ha1q34_9btotal_lean', 'female', age = "<40")
+tlm6a <- train_test_perf_age(predict_enet(tot_lean_female_lasso, dxa_train_female), 
+                             predict_enet(tot_lean_female_lasso, dxa_test_female),
+                             'ha1q34_9btotal_lean', 'female', age = "<40")
+tlm7a <- train_test_perf_age(predict(tot_lean_female_rf, dxa_train_female)$predictions, 
+                             predict(tot_lean_female_rf, dxa_test_female)$predictions,
+                             'ha1q34_9btotal_lean', 'female', age = "<40")
+tlm8a <- train_test_perf_age(predict(tot_lean_female_xgb, dxa_train_female), 
+                             predict(tot_lean_female_xgb, dxa_test_female),
+                             'ha1q34_9btotal_lean', 'female', age = "<40")
+
+tlm1b <- train_test_perf_age(1000*dxa_train_male[,'ha1q37_5iii_tbf_free_mass'], 
+                             1000*dxa_test_male[,'ha1q37_5iii_tbf_free_mass'], 
+                             'ha1q34_9btotal_lean', 'male', age = "40+")
+tlm2b <- train_test_perf_age(predict_enet(tot_lean_male_lasso, dxa_train_male), 
+                             predict_enet(tot_lean_male_lasso, dxa_test_male),
+                             'ha1q34_9btotal_lean', 'male', age = "40+")
+tlm3b <- train_test_perf_age(predict(tot_lean_male_rf, dxa_train_male)$predictions, 
+                             predict(tot_lean_male_rf, dxa_test_male)$predictions,
+                             'ha1q34_9btotal_lean', 'male', age = "40+")
+tlm4b <- train_test_perf_age(predict(tot_lean_male_xgb, dxa_train_male), 
+                             predict(tot_lean_male_xgb, dxa_test_male),
+                             'ha1q34_9btotal_lean', 'male', age = "40+")
+
+tlm5b <- train_test_perf_age(1000*dxa_train_female[,'ha1q37_5iii_tbf_free_mass'], 
+                             1000*dxa_test_female[,'ha1q37_5iii_tbf_free_mass'], 
+                             'ha1q34_9btotal_lean', 'female', age = "40+")
+tlm6b <- train_test_perf_age(predict_enet(tot_lean_female_lasso, dxa_train_female), 
+                             predict_enet(tot_lean_female_lasso, dxa_test_female),
+                             'ha1q34_9btotal_lean', 'female', age = "40+")
+tlm7b <- train_test_perf_age(predict(tot_lean_female_rf, dxa_train_female)$predictions, 
+                             predict(tot_lean_female_rf, dxa_test_female)$predictions,
+                             'ha1q34_9btotal_lean', 'female', age = "40+")
+tlm8b <- train_test_perf_age(predict(tot_lean_female_xgb, dxa_train_female), 
+                             predict(tot_lean_female_xgb, dxa_test_female),
+                             'ha1q34_9btotal_lean', 'female', age = "40+")
+
+
+totalleanresults_u40 <- rbind(tlm1a, tlm2a, tlm3a, tlm4a, tlm5a, 
+                              tlm6a, tlm7a, tlm8a)
+totalleanresults_o40 <- rbind(tlm1b, tlm2b, tlm3b, tlm4b, tlm5b, 
+                              tlm6b, tlm7b, tlm8b)
 
 
 # Outcome = total fat %, ha1q34_9dtotal_pcent_fat
@@ -710,24 +920,88 @@ totalfatpresults <- rbind(tfp1, tfp2, tfp3, tfp4, tfp5, tfp6, tfp7, tfp8)
 # plots
 p1 = blandr.draw(predict_enet(tot_p_male_lasso, dxa_test_male), 
                  dxa_test_male[,'ha1q34_9dtotal_pcent_fat'],
-                 plotTitle = "Total fat %, male, Full LASSO", ciShading = FALSE, ciDisplay = FALSE) 
+                 plotTitle = "Total fat %, male, Full LASSO", ciShading = FALSE, ciDisplay = FALSE) + geom_smooth(method = "lm")
 p2 = blandr.draw(predict_enet(tot_p_female_lasso, dxa_test_female), 
                  dxa_test_female[,'ha1q34_9dtotal_pcent_fat'],
-                 plotTitle = "Total fat %, female, Full LASSO", ciShading = FALSE, ciDisplay = FALSE) 
+                 plotTitle = "Total fat %, female, Full LASSO", ciShading = FALSE, ciDisplay = FALSE) + geom_smooth(method = "lm")
 
 
 p3 = blandr.draw(dxa_test_male[,'ha1q37_5i_tbf_pcent'], 
                  dxa_test_male[,'ha1q34_9dtotal_pcent_fat'],
-                 plotTitle = "Total fat %, male, Tanita", ciShading = FALSE, ciDisplay = FALSE) 
+                 plotTitle = "Total fat %, male, Tanita", ciShading = FALSE, ciDisplay = FALSE) + geom_smooth(method = "lm")
 p4 = blandr.draw(dxa_test_female[,'ha1q37_5i_tbf_pcent'], 
                  dxa_test_female[,'ha1q34_9dtotal_pcent_fat'],
-                 plotTitle = "Total fat %, female, Tanita", ciShading = FALSE, ciDisplay = FALSE) 
+                 plotTitle = "Total fat %, female, Tanita", ciShading = FALSE, ciDisplay = FALSE) + geom_smooth(method = "lm")
 
 
 # Display 
+jpeg("totalfatpmale.jpg", width = 660, height = "411")
 grid.arrange(p1, p3, ncol = 2)
-grid.arrange(p2, p4, ncol = 2)
+dev.off()
 
+jpeg("totalfatpfemale.jpg", width = 660, height = "411")
+grid.arrange(p2, p4, ncol = 2)
+dev.off()
+
+# Age-stratified
+# Performance
+tfp1a <- train_test_perf_age(dxa_train_male[,'ha1q37_5i_tbf_pcent'], 
+                        dxa_test_male[,'ha1q37_5i_tbf_pcent'], 
+                        'ha1q34_9dtotal_pcent_fat', 'male',  age = "<40")
+tfp2a <- train_test_perf_age(predict_enet(tot_p_male_lasso, dxa_train_male), 
+                        predict_enet(tot_p_male_lasso, dxa_test_male),
+                        'ha1q34_9dtotal_pcent_fat', 'male',  age = "<40")
+tfp3a <- train_test_perf_age(predict(tot_p_male_rf, dxa_train_male)$predictions, 
+                        predict(tot_p_male_rf, dxa_test_male)$predictions,
+                        'ha1q34_9dtotal_pcent_fat', 'male', age = "<40")
+tfp4a <- train_test_perf_age(predict(tot_p_male_xgb, dxa_train_male), 
+                        predict(tot_p_male_xgb, dxa_test_male),
+                        'ha1q34_9dtotal_pcent_fat', 'male', age = "<40")
+
+
+tfp5a <- train_test_perf_age(dxa_train_female[,'ha1q37_5i_tbf_pcent'], 
+                        dxa_test_female[,'ha1q37_5i_tbf_pcent'], 
+                        'ha1q34_9dtotal_pcent_fat', 'female', age = "<40")
+tfp6a <- train_test_perf_age(predict_enet(tot_p_female_lasso, dxa_train_female), 
+                        predict_enet(tot_p_female_lasso, dxa_test_female),
+                        'ha1q34_9dtotal_pcent_fat', 'female', age = "<40")
+tfp7a <- train_test_perf_age(predict(tot_p_female_rf, dxa_train_female)$predictions, 
+                        predict(tot_p_female_rf, dxa_test_female)$predictions,
+                        'ha1q34_9dtotal_pcent_fat', 'female', age = "<40")
+tfp8a <- train_test_perf_age(predict(tot_p_female_xgb, dxa_train_female), 
+                        predict(tot_p_female_xgb, dxa_test_female),
+                        'ha1q34_9dtotal_pcent_fat', 'female', age = "<40")
+
+totalfatpresults_u40 <- rbind(tfp1a, tfp2a, tfp3a, tfp4a, tfp5a, tfp6a, tfp7a, tfp8a)
+
+tfp1b <- train_test_perf_age(dxa_train_male[,'ha1q37_5i_tbf_pcent'], 
+                             dxa_test_male[,'ha1q37_5i_tbf_pcent'], 
+                             'ha1q34_9dtotal_pcent_fat', 'male',  age = "40+")
+tfp2b <- train_test_perf_age(predict_enet(tot_p_male_lasso, dxa_train_male), 
+                             predict_enet(tot_p_male_lasso, dxa_test_male),
+                             'ha1q34_9dtotal_pcent_fat', 'male',  age = "40+")
+tfp3b <- train_test_perf_age(predict(tot_p_male_rf, dxa_train_male)$predictions, 
+                             predict(tot_p_male_rf, dxa_test_male)$predictions,
+                             'ha1q34_9dtotal_pcent_fat', 'male', age = "40+")
+tfp4b <- train_test_perf_age(predict(tot_p_male_xgb, dxa_train_male), 
+                             predict(tot_p_male_xgb, dxa_test_male),
+                             'ha1q34_9dtotal_pcent_fat', 'male', age = "40+")
+
+
+tfp5b <- train_test_perf_age(dxa_train_female[,'ha1q37_5i_tbf_pcent'], 
+                             dxa_test_female[,'ha1q37_5i_tbf_pcent'], 
+                             'ha1q34_9dtotal_pcent_fat', 'female', age = "40+")
+tfp6b <- train_test_perf_age(predict_enet(tot_p_female_lasso, dxa_train_female), 
+                             predict_enet(tot_p_female_lasso, dxa_test_female),
+                             'ha1q34_9dtotal_pcent_fat', 'female', age = "40+")
+tfp7b <- train_test_perf_age(predict(tot_p_female_rf, dxa_train_female)$predictions, 
+                             predict(tot_p_female_rf, dxa_test_female)$predictions,
+                             'ha1q34_9dtotal_pcent_fat', 'female', age = "40+")
+tfp8b <- train_test_perf_age(predict(tot_p_female_xgb, dxa_train_female), 
+                             predict(tot_p_female_xgb, dxa_test_female),
+                             'ha1q34_9dtotal_pcent_fat', 'female', age = "40+")
+
+totalfatpresults_o40 <- rbind(tfp1b, tfp2b, tfp3b, tfp4b, tfp5b, tfp6b, tfp7b, tfp8b)
 
 # Outcome = Trunk percentage fat mass, ha1q34_6dtrunk_pcent_fat
 
@@ -770,26 +1044,91 @@ trp8 <- train_test_perf(predict(trunk_fat_female_xgb, dxa_train_female),
 # Plots
 p1 = blandr.draw(predict_enet(trunk_fat_male_lasso, dxa_test_male), 
                  dxa_test_male[,'ha1q34_6dtrunk_pcent_fat'],
-                 plotTitle = "Trunk fat %, male, Full LASSO", ciShading = FALSE, ciDisplay = FALSE) 
+                 plotTitle = "Trunk fat %, male, Full LASSO", ciShading = FALSE, ciDisplay = FALSE) + geom_smooth(method = "lm")
 p2 = blandr.draw(predict_enet(trunk_fat_female_lasso, dxa_test_female), 
                  dxa_test_female[,'ha1q34_6dtrunk_pcent_fat'],
-                 plotTitle = "Trunk fat %, female, Full LASSO", ciShading = FALSE, ciDisplay = FALSE) 
+                 plotTitle = "Trunk fat %, female, Full LASSO", ciShading = FALSE, ciDisplay = FALSE) + geom_smooth(method = "lm")
 
 
 p3 = blandr.draw(dxa_test_male[,'ha1q37_11i_seg_tr_pcent'], 
                  dxa_test_male[,'ha1q34_6dtrunk_pcent_fat'],
-                 plotTitle = "Trunk fat %, male, Tanita", ciShading = FALSE, ciDisplay = FALSE) 
+                 plotTitle = "Trunk fat %, male, Tanita", ciShading = FALSE, ciDisplay = FALSE) + geom_smooth(method = "lm")
 p4 = blandr.draw(dxa_test_female[,'ha1q37_11i_seg_tr_pcent'], 
                  dxa_test_female[,'ha1q34_6dtrunk_pcent_fat'],
-                 plotTitle = "Trunk fat %, female, Tanita", ciShading = FALSE, ciDisplay = FALSE) 
+                 plotTitle = "Trunk fat %, female, Tanita", ciShading = FALSE, ciDisplay = FALSE) + geom_smooth(method = "lm")
 
 trunkpercent <- rbind(trp1, trp2, trp3, trp4, trp5, trp6, trp7, trp8)
 
 
 # Display 
+jpeg("trunkfatmale.jpg", width = 660, height = "411")
 grid.arrange(p1, p3, ncol = 2)
-grid.arrange(p2, p4, ncol = 2)
+dev.off()
 
+jpeg("totalfatfemale.jpg", width = 660, height = "411")
+grid.arrange(p2, p4, ncol = 2)
+dev.off()
+
+
+
+# Age stratified
+trp1a <- train_test_perf_age(dxa_train_male[,'ha1q37_11i_seg_tr_pcent'], 
+                        dxa_test_male[,'ha1q37_11i_seg_tr_pcent'], 
+                        'ha1q34_6dtrunk_pcent_fat', 'male', age = "<40")
+trp2a <- train_test_perf_age(predict_enet(trunk_fat_male_lasso, dxa_train_male), 
+                        predict_enet(trunk_fat_male_lasso, dxa_test_male),
+                        'ha1q34_6dtrunk_pcent_fat', 'male', age = "<40")
+trp3a <- train_test_perf_age(predict(trunk_fat_male_rf, dxa_train_male)$predictions, 
+                        predict(trunk_fat_male_rf, dxa_test_male)$predictions,
+                        'ha1q34_6dtrunk_pcent_fat', 'male', age = "<40")
+trp4a <- train_test_perf_age(predict(trunk_fat_male_xgb, dxa_train_male), 
+                        predict(trunk_fat_male_xgb, dxa_test_male),
+                        'ha1q34_6dtrunk_pcent_fat', 'male', age = "<40")
+
+
+trp5a <- train_test_perf_age(dxa_train_female[,'ha1q37_11i_seg_tr_pcent'], 
+                        dxa_test_female[,'ha1q37_11i_seg_tr_pcent'], 
+                        'ha1q34_6dtrunk_pcent_fat', 'female', age = "<40")
+trp6a <- train_test_perf_age(predict_enet(trunk_fat_female_lasso, dxa_train_female), 
+                        predict_enet(trunk_fat_female_lasso, dxa_test_female),
+                        'ha1q34_6dtrunk_pcent_fat', 'female', age = "<40")
+trp7a <- train_test_perf_age(predict(trunk_fat_female_rf, dxa_train_female)$predictions, 
+                        predict(trunk_fat_female_rf, dxa_test_female)$predictions,
+                        'ha1q34_6dtrunk_pcent_fat', 'female', age = "<40")
+trp8a <- train_test_perf_age(predict(trunk_fat_female_xgb, dxa_train_female), 
+                        predict(trunk_fat_female_xgb, dxa_test_female),
+                        'ha1q34_6dtrunk_pcent_fat', 'female', age = "<40")
+
+trunkpercent_u40 <- rbind(trp1a, trp2a, trp3a, trp4a, trp5a, trp6a, trp7a, trp8a)
+
+trp1b <- train_test_perf_age(dxa_train_male[,'ha1q37_11i_seg_tr_pcent'], 
+                             dxa_test_male[,'ha1q37_11i_seg_tr_pcent'], 
+                             'ha1q34_6dtrunk_pcent_fat', 'male', age = "40+")
+trp2b <- train_test_perf_age(predict_enet(trunk_fat_male_lasso, dxa_train_male), 
+                             predict_enet(trunk_fat_male_lasso, dxa_test_male),
+                             'ha1q34_6dtrunk_pcent_fat', 'male', age = "40+")
+trp3b <- train_test_perf_age(predict(trunk_fat_male_rf, dxa_train_male)$predictions, 
+                             predict(trunk_fat_male_rf, dxa_test_male)$predictions,
+                             'ha1q34_6dtrunk_pcent_fat', 'male', age = "40+")
+trp4b <- train_test_perf_age(predict(trunk_fat_male_xgb, dxa_train_male), 
+                             predict(trunk_fat_male_xgb, dxa_test_male),
+                             'ha1q34_6dtrunk_pcent_fat', 'male', age = "40+")
+
+
+trp5b <- train_test_perf_age(dxa_train_female[,'ha1q37_11i_seg_tr_pcent'], 
+                             dxa_test_female[,'ha1q37_11i_seg_tr_pcent'], 
+                             'ha1q34_6dtrunk_pcent_fat', 'female', age = "40+")
+trp6b <- train_test_perf_age(predict_enet(trunk_fat_female_lasso, dxa_train_female), 
+                             predict_enet(trunk_fat_female_lasso, dxa_test_female),
+                             'ha1q34_6dtrunk_pcent_fat', 'female', age = "40+")
+trp7b <- train_test_perf_age(predict(trunk_fat_female_rf, dxa_train_female)$predictions, 
+                             predict(trunk_fat_female_rf, dxa_test_female)$predictions,
+                             'ha1q34_6dtrunk_pcent_fat', 'female', age = "40+")
+trp8b <- train_test_perf_age(predict(trunk_fat_female_xgb, dxa_train_female), 
+                             predict(trunk_fat_female_xgb, dxa_test_female),
+                             'ha1q34_6dtrunk_pcent_fat', 'female', age = "40+")
+
+trunkpercent_o40 <- rbind(trp1b, trp2b, trp3b, trp4b, trp5b, trp6b, trp7b, trp8b)
 
 
 # Outcome = L1-L4 trunk fat percentage, ha1q34_12dl1l4_pcent1
@@ -836,23 +1175,89 @@ l1results <- rbind(l11, l12, l13, l14, l15, l16, l17, l18)
 # Plots
 p1 = blandr.draw(predict_enet(l1_fat_male_lasso, dxa_test_male), 
                  dxa_test_male[,'ha1q34_12dl1l4_pcent1'],
-                 plotTitle = "L1-L4 fat %, male, Full LASSO", ciShading = FALSE, ciDisplay = FALSE) 
+                 plotTitle = "L1-L4 fat %, male, Full LASSO", ciShading = FALSE, ciDisplay = FALSE) + geom_smooth(method = "lm")
 p2 = blandr.draw(predict_enet(l1_fat_female_lasso, dxa_test_female), 
                  dxa_test_female[,'ha1q34_12dl1l4_pcent1'],
-                 plotTitle = "L1-L4 fat %, female, Full LASSO", ciShading = FALSE, ciDisplay = FALSE) 
+                 plotTitle = "L1-L4 fat %, female, Full LASSO", ciShading = FALSE, ciDisplay = FALSE) + geom_smooth(method = "lm")
 
 
 p3 = blandr.draw(dxa_test_male[,'ha1q37_11i_seg_tr_pcent'],
                  dxa_test_male[,'ha1q34_12dl1l4_pcent1'],
-                 plotTitle = "L1-L4 fat %, male, Tanita", ciShading = FALSE, ciDisplay = FALSE) 
+                 plotTitle = "L1-L4 fat %, male, Tanita", ciShading = FALSE, ciDisplay = FALSE) + geom_smooth(method = "lm")
 p4 = blandr.draw(dxa_test_female[,'ha1q37_11i_seg_tr_pcent'],
                  dxa_test_female[,'ha1q34_12dl1l4_pcent1'],
-                 plotTitle = "L1-L4 fat %, female, Tanita", ciShading = FALSE, ciDisplay = FALSE) 
+                 plotTitle = "L1-L4 fat %, female, Tanita", ciShading = FALSE, ciDisplay = FALSE) + geom_smooth(method = "lm")
 
 
 # Display 
+jpeg("l1fatmale.jpg", width = 660, height = "411")
 grid.arrange(p1, p3, ncol = 2)
+dev.off()
+
+jpeg("l1fatfemale.jpg", width = 660, height = "411")
 grid.arrange(p2, p4, ncol = 2)
+dev.off()
+
+
+# Stratified by age 
+l11a <- train_test_perf_age(dxa_train_male[,'ha1q37_11i_seg_tr_pcent'], 
+                       dxa_test_male[,'ha1q37_11i_seg_tr_pcent'], 
+                       'ha1q34_12dl1l4_pcent1', 'male', age = "<40")
+l12a <- train_test_perf_age(predict_enet(l1_fat_male_lasso, dxa_train_male), 
+                       predict_enet(l1_fat_male_lasso, dxa_test_male),
+                       'ha1q34_12dl1l4_pcent1', 'male', age = "<40")
+l13a <- train_test_perf_age(predict(l1_fat_male_rf, dxa_train_male)$predictions, 
+                       predict(l1_fat_male_rf, dxa_test_male)$predictions,
+                       'ha1q34_12dl1l4_pcent1', 'male', age = "<40")
+l14a <- train_test_perf_age(predict(l1_fat_male_xgb, dxa_train_male), 
+                       predict(l1_fat_male_xgb, dxa_test_male),
+                       'ha1q34_12dl1l4_pcent1', 'male', age = "<40")
+
+
+l15a <- train_test_perf_age(dxa_train_female[,'ha1q37_11i_seg_tr_pcent'], 
+                       dxa_test_female[,'ha1q37_11i_seg_tr_pcent'], 
+                       'ha1q34_12dl1l4_pcent1', 'female', age = "<40")
+l16a <- train_test_perf_age(predict_enet(l1_fat_female_lasso, dxa_train_female), 
+                       predict_enet(l1_fat_female_lasso, dxa_test_female),
+                       'ha1q34_12dl1l4_pcent1', 'female', age = "<40")
+l17a <- train_test_perf_age(predict(l1_fat_female_rf, dxa_train_female)$predictions, 
+                       predict(l1_fat_female_rf, dxa_test_female)$predictions,
+                       'ha1q34_12dl1l4_pcent1', 'female', age = "<40")
+l18a <- train_test_perf_age(predict(l1_fat_female_xgb, dxa_train_female), 
+                       predict(l1_fat_female_xgb, dxa_test_female),
+                       'ha1q34_12dl1l4_pcent1', 'female', age = "<40")
+
+l1results_u40 <- rbind(l11a, l12a, l13a, l14a, l15a, l16a, l17a, l18a)
+
+
+l11b <- train_test_perf_age(dxa_train_male[,'ha1q37_11i_seg_tr_pcent'], 
+                            dxa_test_male[,'ha1q37_11i_seg_tr_pcent'], 
+                            'ha1q34_12dl1l4_pcent1', 'male', age = "40+")
+l12b <- train_test_perf_age(predict_enet(l1_fat_male_lasso, dxa_train_male), 
+                            predict_enet(l1_fat_male_lasso, dxa_test_male),
+                            'ha1q34_12dl1l4_pcent1', 'male', age = "40+")
+l13b <- train_test_perf_age(predict(l1_fat_male_rf, dxa_train_male)$predictions, 
+                            predict(l1_fat_male_rf, dxa_test_male)$predictions,
+                            'ha1q34_12dl1l4_pcent1', 'male', age = "40+")
+l14b <- train_test_perf_age(predict(l1_fat_male_xgb, dxa_train_male), 
+                            predict(l1_fat_male_xgb, dxa_test_male),
+                            'ha1q34_12dl1l4_pcent1', 'male', age = "40+")
+
+
+l15b <- train_test_perf_age(dxa_train_female[,'ha1q37_11i_seg_tr_pcent'], 
+                            dxa_test_female[,'ha1q37_11i_seg_tr_pcent'], 
+                            'ha1q34_12dl1l4_pcent1', 'female', age = "40+")
+l16b <- train_test_perf_age(predict_enet(l1_fat_female_lasso, dxa_train_female), 
+                            predict_enet(l1_fat_female_lasso, dxa_test_female),
+                            'ha1q34_12dl1l4_pcent1', 'female', age = "40+")
+l17b <- train_test_perf_age(predict(l1_fat_female_rf, dxa_train_female)$predictions, 
+                            predict(l1_fat_female_rf, dxa_test_female)$predictions,
+                            'ha1q34_12dl1l4_pcent1', 'female', age = "40+")
+l18b <- train_test_perf_age(predict(l1_fat_female_xgb, dxa_train_female), 
+                            predict(l1_fat_female_xgb, dxa_test_female),
+                            'ha1q34_12dl1l4_pcent1', 'female', age = "40+")
+
+l1results_o40 <- rbind(l11b, l12b, l13b, l14b, l15b, l16b, l17b, l18b)
 
 
 # Outcome = appendicular lean mass, appendic_lean
@@ -912,22 +1317,90 @@ apresults <- rbind(ap1, ap2, ap3, ap4, ap5,
 # Plots
 p1 = blandr.draw(predict_enet(app_lean_male_lasso, dxa_test_male), 
                  dxa_test_male[,'appendic_lean'],
-                 plotTitle = "Appendicular lean mass (g), male, Full LASSO", ciShading = FALSE, ciDisplay = FALSE) 
+                 plotTitle = "Appendicular lean mass (g), male, Full LASSO", ciShading = FALSE, ciDisplay = FALSE) + geom_smooth(method = "lm")
 p2 = blandr.draw(predict_enet(app_lean_female_lasso, dxa_test_female), 
                  dxa_test_female[,'appendic_lean'],
-                 plotTitle = "Appendicular lean mass (g), female, Full LASSO", ciShading = FALSE, ciDisplay = FALSE) 
+                 plotTitle = "Appendicular lean mass (g), female, Full LASSO", ciShading = FALSE, ciDisplay = FALSE) + geom_smooth(method = "lm")
 
 
 p3 = blandr.draw(1000*dxa_test_male[,'ha1q37_7iii_seg_rl_free_mass'] + 1000*dxa_test_male[,'ha1q37_8iii_seg_ll_free_mass'] + 1000*dxa_test_male[,'ha1q37_9iii_seg_ra_free_mass'] + 1000*dxa_test_male[,'ha1q37_10iii_seg_la_free_mass'], 
                  dxa_test_male[,'appendic_lean'],
-                 plotTitle = "Appendicular lean mass (g), male, Tanita", ciShading = FALSE, ciDisplay = FALSE) 
+                 plotTitle = "Appendicular lean mass (g), male, Tanita", ciShading = FALSE, ciDisplay = FALSE) + geom_smooth(method = "lm")
 p4 = blandr.draw(1000*dxa_test_female[,'ha1q37_7iii_seg_rl_free_mass'] + 1000*dxa_test_female[,'ha1q37_8iii_seg_ll_free_mass'] + 1000*dxa_test_female[,'ha1q37_9iii_seg_ra_free_mass'] + 1000*dxa_test_female[,'ha1q37_10iii_seg_la_free_mass'], 
                  dxa_test_female[,'appendic_lean'],
-                 plotTitle = "Appendicular lean mass (g), female, Tanita", ciShading = FALSE, ciDisplay = FALSE) 
+                 plotTitle = "Appendicular lean mass (g), female, Tanita", ciShading = FALSE, ciDisplay = FALSE) + geom_smooth(method = "lm")
 
 # Display 
+jpeg("apfatmale.jpg", width = 660, height = "411")
 grid.arrange(p1, p3, ncol = 2)
+dev.off()
+
+jpeg("apfatfemale.jpg", width = 660, height = "411")
 grid.arrange(p2, p4, ncol = 2)
+dev.off()
+
+
+# Age stratified
+ap1a <- train_test_perf_age(1000*dxa_train_male[,'ha1q37_7iii_seg_rl_free_mass'] + 1000*dxa_train_male[,'ha1q37_8iii_seg_ll_free_mass'] + 1000*dxa_train_male[,'ha1q37_9iii_seg_ra_free_mass'] + 1000*dxa_train_male[,'ha1q37_10iii_seg_la_free_mass'], 
+                       1000*dxa_test_male[,'ha1q37_7iii_seg_rl_free_mass'] + 1000*dxa_test_male[,'ha1q37_8iii_seg_ll_free_mass'] + 1000*dxa_test_male[,'ha1q37_9iii_seg_ra_free_mass'] + 1000*dxa_test_male[,'ha1q37_10iii_seg_la_free_mass'], 
+                       'appendic_lean', 'male', age = "<40")
+ap2a <- train_test_perf_age(predict_enet(app_lean_male_lasso, dxa_train_male), 
+                       predict_enet(app_lean_male_lasso, dxa_test_male),
+                       'appendic_lean', 'male', age = "<40")
+ap3a <- train_test_perf_age(predict(app_lean_male_rf, dxa_train_male)$predictions, 
+                       predict(app_lean_male_rf, dxa_test_male)$predictions,
+                       'appendic_lean', 'male', age = "<40")
+ap4a <- train_test_perf_age(predict(app_lean_male_xgb, dxa_train_male), 
+                       predict(app_lean_male_xgb, dxa_test_male),
+                       'appendic_lean', 'male', age = "<40")
+
+
+ap5a <- train_test_perf_age(1000*dxa_train_female[,'ha1q37_7iii_seg_rl_free_mass'] + 1000*dxa_train_female[,'ha1q37_8iii_seg_ll_free_mass'] + 1000*dxa_train_female[,'ha1q37_9iii_seg_ra_free_mass'] + 1000*dxa_train_female[,'ha1q37_10iii_seg_la_free_mass'], 
+                       1000*dxa_test_female[,'ha1q37_7iii_seg_rl_free_mass'] + 1000*dxa_test_female[,'ha1q37_8iii_seg_ll_free_mass'] + 1000*dxa_test_female[,'ha1q37_9iii_seg_ra_free_mass'] + 1000*dxa_test_female[,'ha1q37_10iii_seg_la_free_mass'], 
+                       'appendic_lean', 'female', age = "<40")
+ap6a <- train_test_perf_age(predict_enet(app_lean_female_lasso, dxa_train_female), 
+                       predict_enet(app_lean_female_lasso, dxa_test_female),
+                       'appendic_lean', 'female', age = "<40")
+ap7a <- train_test_perf_age(predict(app_lean_female_rf, dxa_train_female)$predictions, 
+                       predict(app_lean_female_rf, dxa_test_female)$predictions,
+                       'appendic_lean', 'female', age = "<40")
+ap8a <- train_test_perf_age(predict(app_lean_female_xgb, dxa_train_female), 
+                       predict(app_lean_female_xgb, dxa_test_female),
+                       'appendic_lean', 'female', age = "<40")
+
+apresults_u40 <- rbind(ap1a, ap2a, ap3a, ap4a, ap5a,
+                   ap6a, ap7a, ap8a)
+
+
+ap1b <- train_test_perf_age(1000*dxa_train_male[,'ha1q37_7iii_seg_rl_free_mass'] + 1000*dxa_train_male[,'ha1q37_8iii_seg_ll_free_mass'] + 1000*dxa_train_male[,'ha1q37_9iii_seg_ra_free_mass'] + 1000*dxa_train_male[,'ha1q37_10iii_seg_la_free_mass'], 
+                            1000*dxa_test_male[,'ha1q37_7iii_seg_rl_free_mass'] + 1000*dxa_test_male[,'ha1q37_8iii_seg_ll_free_mass'] + 1000*dxa_test_male[,'ha1q37_9iii_seg_ra_free_mass'] + 1000*dxa_test_male[,'ha1q37_10iii_seg_la_free_mass'], 
+                            'appendic_lean', 'male', age = "40+")
+ap2b <- train_test_perf_age(predict_enet(app_lean_male_lasso, dxa_train_male), 
+                            predict_enet(app_lean_male_lasso, dxa_test_male),
+                            'appendic_lean', 'male', age = "40+")
+ap3b <- train_test_perf_age(predict(app_lean_male_rf, dxa_train_male)$predictions, 
+                            predict(app_lean_male_rf, dxa_test_male)$predictions,
+                            'appendic_lean', 'male', age = "40+")
+ap4b <- train_test_perf_age(predict(app_lean_male_xgb, dxa_train_male), 
+                            predict(app_lean_male_xgb, dxa_test_male),
+                            'appendic_lean', 'male', age = "40+")
+
+
+ap5b <- train_test_perf_age(1000*dxa_train_female[,'ha1q37_7iii_seg_rl_free_mass'] + 1000*dxa_train_female[,'ha1q37_8iii_seg_ll_free_mass'] + 1000*dxa_train_female[,'ha1q37_9iii_seg_ra_free_mass'] + 1000*dxa_train_female[,'ha1q37_10iii_seg_la_free_mass'], 
+                            1000*dxa_test_female[,'ha1q37_7iii_seg_rl_free_mass'] + 1000*dxa_test_female[,'ha1q37_8iii_seg_ll_free_mass'] + 1000*dxa_test_female[,'ha1q37_9iii_seg_ra_free_mass'] + 1000*dxa_test_female[,'ha1q37_10iii_seg_la_free_mass'], 
+                            'appendic_lean', 'female', age = "40+")
+ap6b <- train_test_perf_age(predict_enet(app_lean_female_lasso, dxa_train_female), 
+                            predict_enet(app_lean_female_lasso, dxa_test_female),
+                            'appendic_lean', 'female', age = "40+")
+ap7b <- train_test_perf_age(predict(app_lean_female_rf, dxa_train_female)$predictions, 
+                            predict(app_lean_female_rf, dxa_test_female)$predictions,
+                            'appendic_lean', 'female', age = "40+")
+ap8b <- train_test_perf_age(predict(app_lean_female_xgb, dxa_train_female), 
+                            predict(app_lean_female_xgb, dxa_test_female),
+                            'appendic_lean', 'female', age = "40+")
+
+apresults_o40 <- rbind(ap1b, ap2b, ap3b, ap4b, ap5b,
+                       ap6b, ap7b, ap8b)
 
 
 # Process results tables to make more legible
@@ -999,6 +1472,137 @@ write.csv(totalfatpresults, 'totalfatpercentlessints.csv')
 write.csv(trunkpercent, 'trunkfatpercentlessints.csv')
 write.csv(l1results, 'l1l4fatpercentlessints.csv')
 write.csv(apresults, 'appleanmasslessints.csv')
+
+
+
+# Further processing for age-stratified results
+totalfatresults_u40[,1] <- round(totalfatresults_u40[,1]/1000, 2)
+totalfatresults_u40[,2] <- round(totalfatresults_u40[,2]/1000, 3)
+totalfatresults_u40[,3] <- round(totalfatresults_u40[,3]*100, 2)
+totalfatresults_u40[,4] <- round(totalfatresults_u40[,4], 3)
+totalfatresults_u40[,5] <- round(totalfatresults_u40[,5]/1000, 2)
+totalfatresults_u40[,6] <- round(totalfatresults_u40[,6]/1000, 3)
+totalfatresults_u40[,7] <- round(totalfatresults_u40[,7]*100, 2)
+totalfatresults_u40[,8] <- round(totalfatresults_u40[,8], 3)
+
+totalfatresults_o40[,1] <- round(totalfatresults_o40[,1]/1000, 2)
+totalfatresults_o40[,2] <- round(totalfatresults_o40[,2]/1000, 3)
+totalfatresults_o40[,3] <- round(totalfatresults_o40[,3]*100, 2)
+totalfatresults_o40[,4] <- round(totalfatresults_o40[,4], 3)
+totalfatresults_o40[,5] <- round(totalfatresults_o40[,5]/1000, 2)
+totalfatresults_o40[,6] <- round(totalfatresults_o40[,6]/1000, 3)
+totalfatresults_o40[,7] <- round(totalfatresults_o40[,7]*100, 2)
+totalfatresults_o40[,8] <- round(totalfatresults_o40[,8], 3)
+
+
+
+totalleanresults_u40[,1] <- round(totalleanresults_u40[,1]/1000, 2)
+totalleanresults_u40[,2] <- round(totalleanresults_u40[,2]/1000, 3)
+totalleanresults_u40[,3] <- round(totalleanresults_u40[,3]*100, 2)
+totalleanresults_u40[,4] <- round(totalleanresults_u40[,4], 3)
+totalleanresults_u40[,5] <- round(totalleanresults_u40[,5]/1000, 2)
+totalleanresults_u40[,6] <- round(totalleanresults_u40[,6]/1000, 3)
+totalleanresults_u40[,7] <- round(totalleanresults_u40[,7]*100, 2)
+totalleanresults_u40[,8] <- round(totalleanresults_u40[,8], 3)
+
+totalleanresults_o40[,1] <- round(totalleanresults_o40[,1]/1000, 2)
+totalleanresults_o40[,2] <- round(totalleanresults_o40[,2]/1000, 3)
+totalleanresults_o40[,3] <- round(totalleanresults_o40[,3]*100, 2)
+totalleanresults_o40[,4] <- round(totalleanresults_o40[,4], 3)
+totalleanresults_o40[,5] <- round(totalleanresults_o40[,5]/1000, 2)
+totalleanresults_o40[,6] <- round(totalleanresults_o40[,6]/1000, 3)
+totalleanresults_o40[,7] <- round(totalleanresults_o40[,7]*100, 2)
+totalleanresults_o40[,8] <- round(totalleanresults_o40[,8], 3)
+
+
+apresults_u40[,1] <- round(apresults_u40[,1]/1000, 2)
+apresults_u40[,2] <- round(apresults_u40[,2]/1000, 3)
+apresults_u40[,3] <- round(apresults_u40[,3]*100, 2)
+apresults_u40[,4] <- round(apresults_u40[,4], 3)
+apresults_u40[,5] <- round(apresults_u40[,5]/1000, 2)
+apresults_u40[,6] <- round(apresults_u40[,6]/1000, 3)
+apresults_u40[,7] <- round(apresults_u40[,7]*100, 2)
+apresults_u40[,8] <- round(apresults_u40[,8], 3)
+
+apresults_o40[,1] <- round(apresults_o40[,1]/1000, 2)
+apresults_o40[,2] <- round(apresults_o40[,2]/1000, 3)
+apresults_o40[,3] <- round(apresults_o40[,3]*100, 2)
+apresults_o40[,4] <- round(apresults_o40[,4], 3)
+apresults_o40[,5] <- round(apresults_o40[,5]/1000, 2)
+apresults_o40[,6] <- round(apresults_o40[,6]/1000, 3)
+apresults_o40[,7] <- round(apresults_o40[,7]*100, 2)
+apresults_o40[,8] <- round(apresults_o40[,8], 3)
+
+
+totalfatpresults_u40[,1] <- round(totalfatpresults_u40[,1], 3)
+totalfatpresults_u40[,2] <- round(totalfatpresults_u40[,2], 3)
+totalfatpresults_u40[,3] <- round(totalfatpresults_u40[,3]*100, 2)
+totalfatpresults_u40[,4] <- round(totalfatpresults_u40[,4], 3)
+totalfatpresults_u40[,5] <- round(totalfatpresults_u40[,5], 3)
+totalfatpresults_u40[,6] <- round(totalfatpresults_u40[,6], 3)
+totalfatpresults_u40[,7] <- round(totalfatpresults_u40[,7]*100, 2)
+totalfatpresults_u40[,8] <- round(totalfatpresults_u40[,8], 3)
+
+totalfatpresults_o40[,1] <- round(totalfatpresults_o40[,1], 3)
+totalfatpresults_o40[,2] <- round(totalfatpresults_o40[,2], 3)
+totalfatpresults_o40[,3] <- round(totalfatpresults_o40[,3]*100, 2)
+totalfatpresults_o40[,4] <- round(totalfatpresults_o40[,4], 3)
+totalfatpresults_o40[,5] <- round(totalfatpresults_o40[,5], 3)
+totalfatpresults_o40[,6] <- round(totalfatpresults_o40[,6], 3)
+totalfatpresults_o40[,7] <- round(totalfatpresults_o40[,7]*100, 2)
+totalfatpresults_o40[,8] <- round(totalfatpresults_o40[,8], 3)
+
+trunkpercent_u40[,1] <- round(trunkpercent_u40[,1], 3)
+trunkpercent_u40[,2] <- round(trunkpercent_u40[,2], 3)
+trunkpercent_u40[,3] <- round(trunkpercent_u40[,3]*100, 2)
+trunkpercent_u40[,4] <- round(trunkpercent_u40[,4], 3)
+trunkpercent_u40[,5] <- round(trunkpercent_u40[,5], 3)
+trunkpercent_u40[,6] <- round(trunkpercent_u40[,6], 3)
+trunkpercent_u40[,7] <- round(trunkpercent_u40[,7]*100, 2)
+trunkpercent_u40[,8] <- round(trunkpercent_u40[,8], 3)
+
+trunkpercent_o40[,1] <- round(trunkpercent_o40[,1], 3)
+trunkpercent_o40[,2] <- round(trunkpercent_o40[,2], 3)
+trunkpercent_o40[,3] <- round(trunkpercent_o40[,3]*100, 2)
+trunkpercent_o40[,4] <- round(trunkpercent_o40[,4], 3)
+trunkpercent_o40[,5] <- round(trunkpercent_o40[,5], 3)
+trunkpercent_o40[,6] <- round(trunkpercent_o40[,6], 3)
+trunkpercent_o40[,7] <- round(trunkpercent_o40[,7]*100, 2)
+trunkpercent_o40[,8] <- round(trunkpercent_o40[,8], 3)
+
+l1results_u40[,1] <- round(l1results_u40[,1], 3)
+l1results_u40[,2] <- round(l1results_u40[,2], 3)
+l1results_u40[,3] <- round(l1results_u40[,3]*100, 2)
+l1results_u40[,4] <- round(l1results_u40[,4], 3)
+l1results_u40[,5] <- round(l1results_u40[,5], 3)
+l1results_u40[,6] <- round(l1results_u40[,6], 3)
+l1results_u40[,7] <- round(l1results_u40[,7]*100, 2)
+l1results_u40[,8] <- round(l1results_u40[,8], 3)
+
+l1results_o40[,1] <- round(l1results_o40[,1], 3)
+l1results_o40[,2] <- round(l1results_o40[,2], 3)
+l1results_o40[,3] <- round(l1results_o40[,3]*100, 2)
+l1results_o40[,4] <- round(l1results_o40[,4], 3)
+l1results_o40[,5] <- round(l1results_o40[,5], 3)
+l1results_o40[,6] <- round(l1results_o40[,6], 3)
+l1results_o40[,7] <- round(l1results_o40[,7]*100, 2)
+l1results_o40[,8] <- round(l1results_o40[,8], 3)
+
+
+
+# EXPORT RESULTS
+write.csv(totalfatresults_u40, 'totalfatmasslessints_u40.csv')
+write.csv(totalfatresults_o40, 'totalfatmasslessints_o40.csv')
+write.csv(totalleanresults_u40, 'totalleanmasslessints_u40.csv')
+write.csv(totalleanresults_o40, 'totalleanmasslessints_o40.csv')
+write.csv(totalfatpresults_u40, 'totalfatpercentlessints_u40.csv')
+write.csv(totalfatpresults_o40, 'totalfatpercentlessints_o40.csv')
+write.csv(trunkpercent_u40, 'trunkfatpercentlessints_u40.csv')
+write.csv(trunkpercent_o40, 'trunkfatpercentlessints_o40.csv')
+write.csv(l1results_u40, 'l1l4fatpercentlessints_u40.csv')
+write.csv(l1results_o40, 'l1l4fatpercentlessints_o40.csv')
+write.csv(apresults_u40, 'appleanmasslessints_u40.csv')
+write.csv(apresults_o40, 'appleanmasslessints_o40.csv')
 
 
 # Check LASSO Coefficients in aggregate
@@ -1154,6 +1758,91 @@ sum(as.matrix(abs(coef(app_lean_male_lasso))[-1, 1]) * sapply(dxa_train_male[c(6
 sum(as.matrix(abs(coef(app_lean_female_lasso))[-1, 1]) * sapply(dxa_train_female[c(6:50, 53:69)], sd) == 0)
 
 
+
+
+##########################
+# STANDARD REGRESSION ADDED
+##########################
+
+# Per reviewer comments, we can also add a comparison to standard regression models
+make_lm <- function(outcome_var, sex){
+  if(sex == 'male'){
+    trainmat <- dxa_train_male %>% select(colnames(dxa_train_male)[c(6:50, 53:69)])
+    trainmat$outcome = dxa_train_male[,outcome_var]
+    lmmod <- lm(outcome ~ ., data = trainmat)
+    
+    return(lmmod)
+  }
+  else if(sex == 'female'){
+    trainmat <- dxa_train_female %>% select(colnames(dxa_train_male)[c(6:50, 53:69)]) 
+    trainmat$outcome = dxa_train_female[,outcome_var]
+    lmmod <- lm(outcome ~ ., data = trainmat)
+    
+    return(lmmod)
+  }
+}
+
+# We can do all 6 outcomes here
+total_fat_male_lm <- make_lm('ha1q34_9atotal_fat', 'male')
+total_fat_female_lm <- make_lm('ha1q34_9atotal_fat', 'female')
+totalfatlmm <- train_test_perf(predict(total_fat_male_lm, dxa_train_male), 
+                         predict(total_fat_male_lm, dxa_test_male),
+                         'ha1q34_9atotal_fat', 'male')
+totalfatlmf <- train_test_perf(predict(total_fat_female_lm, dxa_train_female), 
+                         predict(total_fat_female_lm, dxa_test_female),
+                         'ha1q34_9atotal_fat', 'female')
+
+total_lean_male_lm <- make_lm('ha1q34_9btotal_lean', 'male')
+total_lean_female_lm <- make_lm('ha1q34_9btotal_lean', 'female')
+totalleanlmm <- train_test_perf(predict(total_lean_male_lm, dxa_train_male), 
+                               predict(total_lean_male_lm, dxa_test_male),
+                               'ha1q34_9btotal_lean', 'male')
+totalleanlmf <- train_test_perf(predict(total_lean_female_lm, dxa_train_female), 
+                               predict(total_lean_female_lm, dxa_test_female),
+                               'ha1q34_9btotal_lean', 'female')
+
+total_fatp_male_lm <- make_lm('ha1q34_9dtotal_pcent_fat', 'male')
+total_fatp_female_lm <- make_lm('ha1q34_9dtotal_pcent_fat', 'female')
+totalfatplmm <- train_test_perf(predict(total_fatp_male_lm, dxa_train_male), 
+                               predict(total_fatp_male_lm, dxa_test_male),
+                               'ha1q34_9dtotal_pcent_fat', 'male')
+totalfatplmf <- train_test_perf(predict(total_fatp_female_lm, dxa_train_female), 
+                               predict(total_fatp_female_lm, dxa_test_female),
+                               'ha1q34_9dtotal_pcent_fat', 'female')
+
+trunk_fat_male_lm <- make_lm('ha1q34_6dtrunk_pcent_fat', 'male')
+trunk_fatp_female_lm <- make_lm('ha1q34_6dtrunk_pcent_fat', 'female')
+trunkfatplmm <- train_test_perf(predict(trunk_fat_male_lm, dxa_train_male), 
+                                predict(trunk_fat_male_lm, dxa_test_male),
+                                'ha1q34_6dtrunk_pcent_fat', 'male')
+trunkfatplmf <- train_test_perf(predict(trunk_fatp_female_lm, dxa_train_female), 
+                                predict(trunk_fatp_female_lm, dxa_test_female),
+                                'ha1q34_6dtrunk_pcent_fat', 'female')
+
+
+l1_fat_male_lm <- make_lm('ha1q34_12dl1l4_pcent1', 'male')
+l1_fat_female_lm <- make_lm('ha1q34_12dl1l4_pcent1', 'female')
+l1lmm <- train_test_perf(predict(l1_fat_male_lm, dxa_train_male), 
+                       predict(l1_fat_male_lm, dxa_test_male),
+                       'ha1q34_12dl1l4_pcent1', 'male')
+l1lmf <- train_test_perf(predict(l1_fat_female_lm, dxa_train_female), 
+                       predict(l1_fat_female_lm, dxa_test_female),
+                       'ha1q34_12dl1l4_pcent1', 'female')
+
+
+app_leanmale_lm <- make_lm('appendic_lean', 'male')
+app_lean_female_lm <- make_lm('appendic_lean', 'female')
+appleanlmm <- train_test_perf(predict(app_leanmale_lm, dxa_train_male), 
+                         predict(app_leanmale_lm, dxa_test_male),
+                         'appendic_lean', 'male')
+appleanlmf <- train_test_perf(predict(app_lean_female_lm, dxa_train_female), 
+                         predict(app_lean_female_lm, dxa_test_female),
+                         'appendic_lean', 'female')
+
+
+# Export
+lm_results = rbind(totalfatlmm, totalfatlmf, totalleanlmm, totalleanlmf, totalfatplmm, totalfatplmf, trunkfatplmm, trunkfatplmf, l1lmm, l1lmf, appleanlmm, appleanlmf)
+write.csv(lm_results, 'lm_results.csv')
 
 ##########################
 # STATION SUBTRACTION ANALYSIS
