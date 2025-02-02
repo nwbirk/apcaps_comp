@@ -624,7 +624,7 @@ totalfat_perm = data.frame(RMSE_train	= numeric(8),
                            MAPE_test	= numeric(8),
                            R2_test	= numeric(8))
 
-for(i in 1:3){
+for(i in 1:100){
   # Have backup copies of dataset from before permutation
   dxa_train_male_save = dxa_train_male
   dxa_test_male_save = dxa_test_male
@@ -691,8 +691,6 @@ for(i in 1:3){
                           'ha1q34_9atotal_fat', 'female')
   
   totalfatresults <- rbind(tfm1, tfm2, tfm3, tfm4, tfm5, tfm6, tfm7, tfm8)
-  
-  head(totalfatresults)
   
   totalfat_perm = totalfat_perm + totalfatresults
   
