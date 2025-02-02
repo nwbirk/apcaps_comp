@@ -611,268 +611,597 @@ predict_enet <- function(model, dataset){
 # Also consider setting seed for each of these separately so they can be run 
 # One at a time instead of needing to run for all 6 outcomes at once
 
-# Models
-tot_fat_male_lasso <- make_lasso('ha1q34_9atotal_fat', 'male')
-tot_fat_male_rf <- make_rf('ha1q34_9atotal_fat', 'male')
-tot_fat_male_xgb <- make_xgb('ha1q34_9atotal_fat', 'male')
-tot_fat_female_lasso <- make_lasso('ha1q34_9atotal_fat', 'female')
-tot_fat_female_rf <- make_rf('ha1q34_9atotal_fat', 'female')
-tot_fat_female_xgb <- make_xgb('ha1q34_9atotal_fat', 'female')
-
-# Performance
-tfm1 <- train_test_perf(1000*dxa_train_male[,'ha1q37_5ii_tbf_mass'], 
-                        1000*dxa_test_male[,'ha1q37_5ii_tbf_mass'], 
-                        'ha1q34_9atotal_fat', 'male')
-tfm2 <- train_test_perf(predict_enet(tot_fat_male_lasso, dxa_train_male), 
-                        predict_enet(tot_fat_male_lasso, dxa_test_male),
-                        'ha1q34_9atotal_fat', 'male')
-tfm3 <- train_test_perf(predict(tot_fat_male_rf, dxa_train_male)$predictions, 
-                        predict(tot_fat_male_rf, dxa_test_male)$predictions,
-                        'ha1q34_9atotal_fat', 'male')
-tfm4 <- train_test_perf(predict(tot_fat_male_xgb, dxa_train_male), 
-                        predict(tot_fat_male_xgb, dxa_test_male),
-                        'ha1q34_9atotal_fat', 'male')
 
 
-tfm5 <- train_test_perf(1000*dxa_train_female[,'ha1q37_5ii_tbf_mass'], 
-                        1000*dxa_test_female[,'ha1q37_5ii_tbf_mass'], 
-                        'ha1q34_9atotal_fat', 'female')
-tfm6 <- train_test_perf(predict_enet(tot_fat_female_lasso, dxa_train_female), 
-                        predict_enet(tot_fat_female_lasso, dxa_test_female),
-                        'ha1q34_9atotal_fat', 'female')
-tfm7 <- train_test_perf(predict(tot_fat_female_rf, dxa_train_female)$predictions, 
-                        predict(tot_fat_female_rf, dxa_test_female)$predictions,
-                        'ha1q34_9atotal_fat', 'female')
-tfm8 <- train_test_perf(predict(tot_fat_female_xgb, dxa_train_female), 
-                        predict(tot_fat_female_xgb, dxa_test_female),
-                        'ha1q34_9atotal_fat', 'female')
+set.seed(88)
 
-totalfatresults <- rbind(tfm1, tfm2, tfm3, tfm4, tfm5, tfm6, tfm7, tfm8)
+totalfat_perm = data.frame(RMSE_train	= numeric(8),
+                           MAE_train	= numeric(8),
+                           MAPE_train	= numeric(8),
+                           R2_train	= numeric(8),
+                           RMSE_test	= numeric(8),
+                           MAE_test	= numeric(8),
+                           MAPE_test	= numeric(8),
+                           R2_test	= numeric(8))
+
+for(i in 1:3){
+  # Have backup copies of dataset from before permutation
+  dxa_train_male_save = dxa_train_male
+  dxa_test_male_save = dxa_test_male
+  dxa_train_female_save = dxa_train_female
+  dxa_test_female_save = dxa_test_female
+  
+  # Randomly sample order for males
+  new_order = sample(1:(length(c(dxa_train_male[,'ha1q37_5ii_tbf_mass'], dxa_test_male[,'ha1q37_5ii_tbf_mass']))),
+                     length(c(dxa_train_male[,'ha1q37_5ii_tbf_mass'], dxa_test_male[,'ha1q37_5ii_tbf_mass'])))
+  
+  
+  out_vec = c(dxa_train_male[,'ha1q37_5ii_tbf_mass'], dxa_test_male[,'ha1q37_5ii_tbf_mass'])
+  out_vec = out_vec[new_order]
+  
+  dxa_train_male[,'ha1q37_5ii_tbf_mass']  = out_vec[1:nrow(dxa_train_male)]
+  dxa_test_male[,'ha1q37_5ii_tbf_mass']  = out_vec[(nrow(dxa_train_male)+1):length(out_vec)]
+  
+  # Randomly sample order for females
+  new_order = sample(1:(length(c(dxa_train_female[,'ha1q37_5ii_tbf_mass'], dxa_test_female[,'ha1q37_5ii_tbf_mass']))),
+                     length(c(dxa_train_female[,'ha1q37_5ii_tbf_mass'], dxa_test_female[,'ha1q37_5ii_tbf_mass'])))
+  
+  
+  out_vec = c(dxa_train_female[,'ha1q37_5ii_tbf_mass'], dxa_test_female[,'ha1q37_5ii_tbf_mass'])
+  out_vec = out_vec[new_order]
+  
+  dxa_train_female[,'ha1q37_5ii_tbf_mass']  = out_vec[1:nrow(dxa_train_female)]
+  dxa_test_female[,'ha1q37_5ii_tbf_mass']  = out_vec[(nrow(dxa_train_female)+1):length(out_vec)]
+  
+  
+  # Models
+  tot_fat_male_lasso <- make_lasso('ha1q34_9atotal_fat', 'male')
+  tot_fat_male_rf <- make_rf('ha1q34_9atotal_fat', 'male')
+  tot_fat_male_xgb <- make_xgb('ha1q34_9atotal_fat', 'male')
+  tot_fat_female_lasso <- make_lasso('ha1q34_9atotal_fat', 'female')
+  tot_fat_female_rf <- make_rf('ha1q34_9atotal_fat', 'female')
+  tot_fat_female_xgb <- make_xgb('ha1q34_9atotal_fat', 'female')
+  
+  # Performance
+  tfm1 <- train_test_perf(1000*dxa_train_male[,'ha1q37_5ii_tbf_mass'], 
+                          1000*dxa_test_male[,'ha1q37_5ii_tbf_mass'], 
+                          'ha1q34_9atotal_fat', 'male')
+  tfm2 <- train_test_perf(predict_enet(tot_fat_male_lasso, dxa_train_male), 
+                          predict_enet(tot_fat_male_lasso, dxa_test_male),
+                          'ha1q34_9atotal_fat', 'male')
+  tfm3 <- train_test_perf(predict(tot_fat_male_rf, dxa_train_male)$predictions, 
+                          predict(tot_fat_male_rf, dxa_test_male)$predictions,
+                          'ha1q34_9atotal_fat', 'male')
+  tfm4 <- train_test_perf(predict(tot_fat_male_xgb, dxa_train_male), 
+                          predict(tot_fat_male_xgb, dxa_test_male),
+                          'ha1q34_9atotal_fat', 'male')
+  
+  
+  tfm5 <- train_test_perf(1000*dxa_train_female[,'ha1q37_5ii_tbf_mass'], 
+                          1000*dxa_test_female[,'ha1q37_5ii_tbf_mass'], 
+                          'ha1q34_9atotal_fat', 'female')
+  tfm6 <- train_test_perf(predict_enet(tot_fat_female_lasso, dxa_train_female), 
+                          predict_enet(tot_fat_female_lasso, dxa_test_female),
+                          'ha1q34_9atotal_fat', 'female')
+  tfm7 <- train_test_perf(predict(tot_fat_female_rf, dxa_train_female)$predictions, 
+                          predict(tot_fat_female_rf, dxa_test_female)$predictions,
+                          'ha1q34_9atotal_fat', 'female')
+  tfm8 <- train_test_perf(predict(tot_fat_female_xgb, dxa_train_female), 
+                          predict(tot_fat_female_xgb, dxa_test_female),
+                          'ha1q34_9atotal_fat', 'female')
+  
+  totalfatresults <- rbind(tfm1, tfm2, tfm3, tfm4, tfm5, tfm6, tfm7, tfm8)
+  
+  head(totalfatresults)
+  
+  totalfat_perm = totalfat_perm + totalfatresults
+  
+  # revert datasets to unpermuted version
+  dxa_train_male = dxa_train_male_save
+  dxa_test_male = dxa_test_male_save
+  dxa_train_female = dxa_train_female_save
+  dxa_test_female = dxa_test_female_save
+  
+}
+
+totalfatresults = totalfat_perm / 100
 
 
 
 # Outcome = Total body lean mass, ha1q34_9btotal_lean
 
-# Models
-tot_lean_male_lasso <- make_lasso('ha1q34_9btotal_lean', 'male')
-tot_lean_male_rf <- make_rf('ha1q34_9btotal_lean', 'male')
-tot_lean_male_xgb <- make_xgb('ha1q34_9btotal_lean', 'male')
-tot_lean_female_lasso <- make_lasso('ha1q34_9btotal_lean', 'female')
-tot_lean_female_rf <- make_rf('ha1q34_9btotal_lean', 'female')
-tot_lean_female_xgb <- make_xgb('ha1q34_9btotal_lean', 'female')
+set.seed(88)
 
-# Performance
-tlm1 <- train_test_perf(1000*dxa_train_male[,'ha1q37_5iii_tbf_free_mass'], 
-                        1000*dxa_test_male[,'ha1q37_5iii_tbf_free_mass'], 
-                        'ha1q34_9btotal_lean', 'male')
-tlm2 <- train_test_perf(predict_enet(tot_lean_male_lasso, dxa_train_male), 
-                        predict_enet(tot_lean_male_lasso, dxa_test_male),
-                        'ha1q34_9btotal_lean', 'male')
-tlm3 <- train_test_perf(predict(tot_lean_male_rf, dxa_train_male)$predictions, 
-                        predict(tot_lean_male_rf, dxa_test_male)$predictions,
-                        'ha1q34_9btotal_lean', 'male')
-tlm4 <- train_test_perf(predict(tot_lean_male_xgb, dxa_train_male), 
-                        predict(tot_lean_male_xgb, dxa_test_male),
-                        'ha1q34_9btotal_lean', 'male')
+totallean_perm = data.frame(RMSE_train	= numeric(8),
+                           MAE_train	= numeric(8),
+                           MAPE_train	= numeric(8),
+                           R2_train	= numeric(8),
+                           RMSE_test	= numeric(8),
+                           MAE_test	= numeric(8),
+                           MAPE_test	= numeric(8),
+                           R2_test	= numeric(8))
 
+for(i in 1:100){
+  # Have backup copies of dataset from before permutation
+  dxa_train_male_save = dxa_train_male
+  dxa_test_male_save = dxa_test_male
+  dxa_train_female_save = dxa_train_female
+  dxa_test_female_save = dxa_test_female
+  
+  # Randomly sample order for males
+  new_order = sample(1:(length(c(dxa_train_male[,'ha1q34_9btotal_lean'], dxa_test_male[,'ha1q34_9btotal_lean']))),
+                     length(c(dxa_train_male[,'ha1q34_9btotal_lean'], dxa_test_male[,'ha1q34_9btotal_lean'])))
+  
+  
+  out_vec = c(dxa_train_male[,'ha1q34_9btotal_lean'], dxa_test_male[,'ha1q34_9btotal_lean'])
+  out_vec = out_vec[new_order]
+  
+  dxa_train_male[,'ha1q34_9btotal_lean']  = out_vec[1:nrow(dxa_train_male)]
+  dxa_test_male[,'ha1q34_9btotal_lean']  = out_vec[(nrow(dxa_train_male)+1):length(out_vec)]
+  
+  # Randomly sample order for females
+  new_order = sample(1:(length(c(dxa_train_female[,'ha1q34_9btotal_lean'], dxa_test_female[,'ha1q34_9btotal_lean']))),
+                     length(c(dxa_train_female[,'ha1q34_9btotal_lean'], dxa_test_female[,'ha1q34_9btotal_lean'])))
+  
+  
+  out_vec = c(dxa_train_female[,'ha1q34_9btotal_lean'], dxa_test_female[,'ha1q34_9btotal_lean'])
+  out_vec = out_vec[new_order]
+  
+  dxa_train_female[,'ha1q34_9btotal_lean']  = out_vec[1:nrow(dxa_train_female)]
+  dxa_test_female[,'ha1q34_9btotal_lean']  = out_vec[(nrow(dxa_train_female)+1):length(out_vec)]
+  
+  
+  # Models
+  tot_lean_male_lasso <- make_lasso('ha1q34_9btotal_lean', 'male')
+  tot_lean_male_rf <- make_rf('ha1q34_9btotal_lean', 'male')
+  tot_lean_male_xgb <- make_xgb('ha1q34_9btotal_lean', 'male')
+  tot_lean_female_lasso <- make_lasso('ha1q34_9btotal_lean', 'female')
+  tot_lean_female_rf <- make_rf('ha1q34_9btotal_lean', 'female')
+  tot_lean_female_xgb <- make_xgb('ha1q34_9btotal_lean', 'female')
+  
+  # Performance
+  tlm1 <- train_test_perf(1000*dxa_train_male[,'ha1q37_5iii_tbf_free_mass'], 
+                          1000*dxa_test_male[,'ha1q37_5iii_tbf_free_mass'], 
+                          'ha1q34_9btotal_lean', 'male')
+  tlm2 <- train_test_perf(predict_enet(tot_lean_male_lasso, dxa_train_male), 
+                          predict_enet(tot_lean_male_lasso, dxa_test_male),
+                          'ha1q34_9btotal_lean', 'male')
+  tlm3 <- train_test_perf(predict(tot_lean_male_rf, dxa_train_male)$predictions, 
+                          predict(tot_lean_male_rf, dxa_test_male)$predictions,
+                          'ha1q34_9btotal_lean', 'male')
+  tlm4 <- train_test_perf(predict(tot_lean_male_xgb, dxa_train_male), 
+                          predict(tot_lean_male_xgb, dxa_test_male),
+                          'ha1q34_9btotal_lean', 'male')
+  
+  
+  tlm5 <- train_test_perf(1000*dxa_train_female[,'ha1q37_5iii_tbf_free_mass'], 
+                          1000*dxa_test_female[,'ha1q37_5iii_tbf_free_mass'], 
+                          'ha1q34_9btotal_lean', 'female')
+  tlm6 <- train_test_perf(predict_enet(tot_lean_female_lasso, dxa_train_female), 
+                          predict_enet(tot_lean_female_lasso, dxa_test_female),
+                          'ha1q34_9btotal_lean', 'female')
+  tlm7 <- train_test_perf(predict(tot_lean_female_rf, dxa_train_female)$predictions, 
+                          predict(tot_lean_female_rf, dxa_test_female)$predictions,
+                          'ha1q34_9btotal_lean', 'female')
+  tlm8 <- train_test_perf(predict(tot_lean_female_xgb, dxa_train_female), 
+                          predict(tot_lean_female_xgb, dxa_test_female),
+                          'ha1q34_9btotal_lean', 'female')
+  
+  
+  totalleanresults <- rbind(tlm1, tlm2, tlm3, tlm4, tlm5, 
+                            tlm6, tlm7, tlm8)
+  
+  
+  totallean_perm = totallean_perm + totalleanresults
+  
+  # revert datasets to unpermuted version
+  dxa_train_male = dxa_train_male_save
+  dxa_test_male = dxa_test_male_save
+  dxa_train_female = dxa_train_female_save
+  dxa_test_female = dxa_test_female_save
+  
+}
 
-tlm5 <- train_test_perf(1000*dxa_train_female[,'ha1q37_5iii_tbf_free_mass'], 
-                        1000*dxa_test_female[,'ha1q37_5iii_tbf_free_mass'], 
-                        'ha1q34_9btotal_lean', 'female')
-tlm6 <- train_test_perf(predict_enet(tot_lean_female_lasso, dxa_train_female), 
-                        predict_enet(tot_lean_female_lasso, dxa_test_female),
-                        'ha1q34_9btotal_lean', 'female')
-tlm7 <- train_test_perf(predict(tot_lean_female_rf, dxa_train_female)$predictions, 
-                        predict(tot_lean_female_rf, dxa_test_female)$predictions,
-                        'ha1q34_9btotal_lean', 'female')
-tlm8 <- train_test_perf(predict(tot_lean_female_xgb, dxa_train_female), 
-                        predict(tot_lean_female_xgb, dxa_test_female),
-                        'ha1q34_9btotal_lean', 'female')
+totalleanresults = totallean_perm/100
 
-# Further, can include comparison to Bharati's equations here (Table 2)
-tlm9 <- train_test_perf((as.numeric(10.385 - (0.005*dxa_train_male$ha1dv_age) + (0.103*dxa_train_male$height/10)+ (0.680*dxa_train_male$ha1q37_2_weight) + (0.288*dxa_train_male$arm_circ/10) + (0.130*dxa_train_male$calf_circ/10) - (0.183*dxa_train_male$hip_circ/10) - (5.278*dxa_train_male$log_skin))*1000), 
-                        (as.numeric(10.385 - (0.005*dxa_test_male$ha1dv_age) + (0.103*dxa_test_male$height/10)+ (0.680*dxa_test_male$ha1q37_2_weight) + (0.288*dxa_test_male$arm_circ/10) + (0.130*dxa_test_male$calf_circ/10) - (0.183*dxa_test_male$hip_circ/10) - (5.278*dxa_test_male$log_skin))*1000),
-                        'ha1q34_9btotal_lean', 'male')
-
-tlm10 <- train_test_perf(as.numeric(10.632 - (0.009*dxa_train_female$ha1dv_age) + (0.102*dxa_train_female$height/10)+ (0.592*dxa_train_female$ha1q37_2_weight) + (0.055*dxa_train_female$arm_circ/10) + (0.043*dxa_train_female$calf_circ/10) - (0.158*dxa_train_female$hip_circ/10) - (3.174*dxa_train_female$log_skin))*1000, 
-                         as.numeric(10.632 - (0.009*dxa_test_female$ha1dv_age) + (0.102*dxa_test_female$height/10)+ (0.592*dxa_test_female$ha1q37_2_weight) + (0.055*dxa_test_female$arm_circ/10) + (0.043*dxa_test_female$calf_circ/10) - (0.158*dxa_test_female$hip_circ/10) - (3.174*dxa_test_female$log_skin))*1000,
-                         'ha1q34_9btotal_lean', 'female')
-
-totalleanresults <- rbind(tlm1, tlm2, tlm3, tlm4, tlm5, 
-                          tlm6, tlm7, tlm8, tlm9, tlm10)
 
 
 # Outcome = total fat %, ha1q34_9dtotal_pcent_fat
 
 
-# Models
-tot_p_male_lasso <- make_lasso('ha1q34_9dtotal_pcent_fat', 'male')
-tot_p_male_rf <- make_rf('ha1q34_9dtotal_pcent_fat', 'male')
-tot_p_male_xgb <- make_xgb('ha1q34_9dtotal_pcent_fat', 'male')
-tot_p_female_lasso <- make_lasso('ha1q34_9dtotal_pcent_fat', 'female')
-tot_p_female_rf <- make_rf('ha1q34_9dtotal_pcent_fat', 'female')
-tot_p_female_xgb <- make_xgb('ha1q34_9dtotal_pcent_fat', 'female')
+set.seed(88)
 
-# Performance
-tfp1 <- train_test_perf(dxa_train_male[,'ha1q37_5i_tbf_pcent'], 
-                        dxa_test_male[,'ha1q37_5i_tbf_pcent'], 
-                        'ha1q34_9dtotal_pcent_fat', 'male')
-tfp2 <- train_test_perf(predict_enet(tot_p_male_lasso, dxa_train_male), 
-                        predict_enet(tot_p_male_lasso, dxa_test_male),
-                        'ha1q34_9dtotal_pcent_fat', 'male')
-tfp3 <- train_test_perf(predict(tot_p_male_rf, dxa_train_male)$predictions, 
-                        predict(tot_p_male_rf, dxa_test_male)$predictions,
-                        'ha1q34_9dtotal_pcent_fat', 'male')
-tfp4 <- train_test_perf(predict(tot_p_male_xgb, dxa_train_male), 
-                        predict(tot_p_male_xgb, dxa_test_male),
-                        'ha1q34_9dtotal_pcent_fat', 'male')
+totalfatp_perm = data.frame(RMSE_train	= numeric(8),
+                            MAE_train	= numeric(8),
+                            MAPE_train	= numeric(8),
+                            R2_train	= numeric(8),
+                            RMSE_test	= numeric(8),
+                            MAE_test	= numeric(8),
+                            MAPE_test	= numeric(8),
+                            R2_test	= numeric(8))
+
+for(i in 1:100){
+  # Have backup copies of dataset from before permutation
+  dxa_train_male_save = dxa_train_male
+  dxa_test_male_save = dxa_test_male
+  dxa_train_female_save = dxa_train_female
+  dxa_test_female_save = dxa_test_female
+  
+  # Randomly sample order for males
+  new_order = sample(1:(length(c(dxa_train_male[,'ha1q34_9dtotal_pcent_fat'], dxa_test_male[,'ha1q34_9dtotal_pcent_fat']))),
+                     length(c(dxa_train_male[,'ha1q34_9dtotal_pcent_fat'], dxa_test_male[,'ha1q34_9dtotal_pcent_fat'])))
+  
+  
+  out_vec = c(dxa_train_male[,'ha1q34_9dtotal_pcent_fat'], dxa_test_male[,'ha1q34_9dtotal_pcent_fat'])
+  out_vec = out_vec[new_order]
+  
+  dxa_train_male[,'ha1q34_9dtotal_pcent_fat']  = out_vec[1:nrow(dxa_train_male)]
+  dxa_test_male[,'ha1q34_9dtotal_pcent_fat']  = out_vec[(nrow(dxa_train_male)+1):length(out_vec)]
+  
+  # Randomly sample order for females
+  new_order = sample(1:(length(c(dxa_train_female[,'ha1q34_9dtotal_pcent_fat'], dxa_test_female[,'ha1q34_9dtotal_pcent_fat']))),
+                     length(c(dxa_train_female[,'ha1q34_9dtotal_pcent_fat'], dxa_test_female[,'ha1q34_9dtotal_pcent_fat'])))
+  
+  
+  out_vec = c(dxa_train_female[,'ha1q34_9dtotal_pcent_fat'], dxa_test_female[,'ha1q34_9dtotal_pcent_fat'])
+  out_vec = out_vec[new_order]
+  
+  dxa_train_female[,'ha1q34_9dtotal_pcent_fat']  = out_vec[1:nrow(dxa_train_female)]
+  dxa_test_female[,'ha1q34_9dtotal_pcent_fat']  = out_vec[(nrow(dxa_train_female)+1):length(out_vec)]
+  
+  
+  
+  # Models
+  tot_p_male_lasso <- make_lasso('ha1q34_9dtotal_pcent_fat', 'male')
+  tot_p_male_rf <- make_rf('ha1q34_9dtotal_pcent_fat', 'male')
+  tot_p_male_xgb <- make_xgb('ha1q34_9dtotal_pcent_fat', 'male')
+  tot_p_female_lasso <- make_lasso('ha1q34_9dtotal_pcent_fat', 'female')
+  tot_p_female_rf <- make_rf('ha1q34_9dtotal_pcent_fat', 'female')
+  tot_p_female_xgb <- make_xgb('ha1q34_9dtotal_pcent_fat', 'female')
+  
+  # Performance
+  tfp1 <- train_test_perf(dxa_train_male[,'ha1q37_5i_tbf_pcent'], 
+                          dxa_test_male[,'ha1q37_5i_tbf_pcent'], 
+                          'ha1q34_9dtotal_pcent_fat', 'male')
+  tfp2 <- train_test_perf(predict_enet(tot_p_male_lasso, dxa_train_male), 
+                          predict_enet(tot_p_male_lasso, dxa_test_male),
+                          'ha1q34_9dtotal_pcent_fat', 'male')
+  tfp3 <- train_test_perf(predict(tot_p_male_rf, dxa_train_male)$predictions, 
+                          predict(tot_p_male_rf, dxa_test_male)$predictions,
+                          'ha1q34_9dtotal_pcent_fat', 'male')
+  tfp4 <- train_test_perf(predict(tot_p_male_xgb, dxa_train_male), 
+                          predict(tot_p_male_xgb, dxa_test_male),
+                          'ha1q34_9dtotal_pcent_fat', 'male')
+  
+  
+  tfp5 <- train_test_perf(dxa_train_female[,'ha1q37_5i_tbf_pcent'], 
+                          dxa_test_female[,'ha1q37_5i_tbf_pcent'], 
+                          'ha1q34_9dtotal_pcent_fat', 'female')
+  tfp6 <- train_test_perf(predict_enet(tot_p_female_lasso, dxa_train_female), 
+                          predict_enet(tot_p_female_lasso, dxa_test_female),
+                          'ha1q34_9dtotal_pcent_fat', 'female')
+  tfp7 <- train_test_perf(predict(tot_p_female_rf, dxa_train_female)$predictions, 
+                          predict(tot_p_female_rf, dxa_test_female)$predictions,
+                          'ha1q34_9dtotal_pcent_fat', 'female')
+  tfp8 <- train_test_perf(predict(tot_p_female_xgb, dxa_train_female), 
+                          predict(tot_p_female_xgb, dxa_test_female),
+                          'ha1q34_9dtotal_pcent_fat', 'female')
+  
+  totalfatpresults <- rbind(tfp1, tfp2, tfp3, tfp4, tfp5, tfp6, tfp7, tfp8)
+  
+  
+  
+  totalfatp_perm = totalfatp_perm + totalfatpresults
+  
+  # revert datasets to unpermuted version
+  dxa_train_male = dxa_train_male_save
+  dxa_test_male = dxa_test_male_save
+  dxa_train_female = dxa_train_female_save
+  dxa_test_female = dxa_test_female_save
+  
+}
+
+totalfatpresults=totalfatp_perm/100
 
 
-tfp5 <- train_test_perf(dxa_train_female[,'ha1q37_5i_tbf_pcent'], 
-                        dxa_test_female[,'ha1q37_5i_tbf_pcent'], 
-                        'ha1q34_9dtotal_pcent_fat', 'female')
-tfp6 <- train_test_perf(predict_enet(tot_p_female_lasso, dxa_train_female), 
-                        predict_enet(tot_p_female_lasso, dxa_test_female),
-                        'ha1q34_9dtotal_pcent_fat', 'female')
-tfp7 <- train_test_perf(predict(tot_p_female_rf, dxa_train_female)$predictions, 
-                        predict(tot_p_female_rf, dxa_test_female)$predictions,
-                        'ha1q34_9dtotal_pcent_fat', 'female')
-tfp8 <- train_test_perf(predict(tot_p_female_xgb, dxa_train_female), 
-                        predict(tot_p_female_xgb, dxa_test_female),
-                        'ha1q34_9dtotal_pcent_fat', 'female')
-
-totalfatpresults <- rbind(tfp1, tfp2, tfp3, tfp4, tfp5, tfp6, tfp7, tfp8)
 
 # Outcome = Trunk percentage fat mass, ha1q34_6dtrunk_pcent_fat
 
-# Models
-trunk_fat_male_lasso <- make_lasso('ha1q34_6dtrunk_pcent_fat', 'male')
-trunk_fat_male_rf <- make_rf('ha1q34_6dtrunk_pcent_fat', 'male')
-trunk_fat_male_xgb <- make_xgb('ha1q34_6dtrunk_pcent_fat', 'male')
-trunk_fat_female_lasso <- make_lasso('ha1q34_6dtrunk_pcent_fat', 'female')
-trunk_fat_female_rf <- make_rf('ha1q34_6dtrunk_pcent_fat', 'female')
-trunk_fat_female_xgb <- make_xgb('ha1q34_6dtrunk_pcent_fat', 'female')
+set.seed(88)
 
-# Performance
-trp1 <- train_test_perf(dxa_train_male[,'ha1q37_11i_seg_tr_pcent'], 
-                        dxa_test_male[,'ha1q37_11i_seg_tr_pcent'], 
-                        'ha1q34_6dtrunk_pcent_fat', 'male')
-trp2 <- train_test_perf(predict_enet(trunk_fat_male_lasso, dxa_train_male), 
-                        predict_enet(trunk_fat_male_lasso, dxa_test_male),
-                        'ha1q34_6dtrunk_pcent_fat', 'male')
-trp3 <- train_test_perf(predict(trunk_fat_male_rf, dxa_train_male)$predictions, 
-                        predict(trunk_fat_male_rf, dxa_test_male)$predictions,
-                        'ha1q34_6dtrunk_pcent_fat', 'male')
-trp4 <- train_test_perf(predict(trunk_fat_male_xgb, dxa_train_male), 
-                        predict(trunk_fat_male_xgb, dxa_test_male),
-                        'ha1q34_6dtrunk_pcent_fat', 'male')
+trunkfat_perm = data.frame(RMSE_train	= numeric(8),
+                            MAE_train	= numeric(8),
+                            MAPE_train	= numeric(8),
+                            R2_train	= numeric(8),
+                            RMSE_test	= numeric(8),
+                            MAE_test	= numeric(8),
+                            MAPE_test	= numeric(8),
+                            R2_test	= numeric(8))
 
+for(i in 1:100){
+  # Have backup copies of dataset from before permutation
+  dxa_train_male_save = dxa_train_male
+  dxa_test_male_save = dxa_test_male
+  dxa_train_female_save = dxa_train_female
+  dxa_test_female_save = dxa_test_female
+  
+  # Randomly sample order for males
+  new_order = sample(1:(length(c(dxa_train_male[,'ha1q34_6dtrunk_pcent_fat'], dxa_test_male[,'ha1q34_6dtrunk_pcent_fat']))),
+                     length(c(dxa_train_male[,'ha1q34_6dtrunk_pcent_fat'], dxa_test_male[,'ha1q34_6dtrunk_pcent_fat'])))
+  
+  
+  out_vec = c(dxa_train_male[,'ha1q34_6dtrunk_pcent_fat'], dxa_test_male[,'ha1q34_6dtrunk_pcent_fat'])
+  out_vec = out_vec[new_order]
+  
+  dxa_train_male[,'ha1q34_6dtrunk_pcent_fat']  = out_vec[1:nrow(dxa_train_male)]
+  dxa_test_male[,'ha1q34_6dtrunk_pcent_fat']  = out_vec[(nrow(dxa_train_male)+1):length(out_vec)]
+  
+  # Randomly sample order for females
+  new_order = sample(1:(length(c(dxa_train_female[,'ha1q34_6dtrunk_pcent_fat'], dxa_test_female[,'ha1q34_6dtrunk_pcent_fat']))),
+                     length(c(dxa_train_female[,'ha1q34_6dtrunk_pcent_fat'], dxa_test_female[,'ha1q34_6dtrunk_pcent_fat'])))
+  
+  
+  out_vec = c(dxa_train_female[,'ha1q34_6dtrunk_pcent_fat'], dxa_test_female[,'ha1q34_6dtrunk_pcent_fat'])
+  out_vec = out_vec[new_order]
+  
+  dxa_train_female[,'ha1q34_6dtrunk_pcent_fat']  = out_vec[1:nrow(dxa_train_female)]
+  dxa_test_female[,'ha1q34_6dtrunk_pcent_fat']  = out_vec[(nrow(dxa_train_female)+1):length(out_vec)]
+  
+  
+  
+  
+  # Models
+  trunk_fat_male_lasso <- make_lasso('ha1q34_6dtrunk_pcent_fat', 'male')
+  trunk_fat_male_rf <- make_rf('ha1q34_6dtrunk_pcent_fat', 'male')
+  trunk_fat_male_xgb <- make_xgb('ha1q34_6dtrunk_pcent_fat', 'male')
+  trunk_fat_female_lasso <- make_lasso('ha1q34_6dtrunk_pcent_fat', 'female')
+  trunk_fat_female_rf <- make_rf('ha1q34_6dtrunk_pcent_fat', 'female')
+  trunk_fat_female_xgb <- make_xgb('ha1q34_6dtrunk_pcent_fat', 'female')
+  
+  # Performance
+  trp1 <- train_test_perf(dxa_train_male[,'ha1q37_11i_seg_tr_pcent'], 
+                          dxa_test_male[,'ha1q37_11i_seg_tr_pcent'], 
+                          'ha1q34_6dtrunk_pcent_fat', 'male')
+  trp2 <- train_test_perf(predict_enet(trunk_fat_male_lasso, dxa_train_male), 
+                          predict_enet(trunk_fat_male_lasso, dxa_test_male),
+                          'ha1q34_6dtrunk_pcent_fat', 'male')
+  trp3 <- train_test_perf(predict(trunk_fat_male_rf, dxa_train_male)$predictions, 
+                          predict(trunk_fat_male_rf, dxa_test_male)$predictions,
+                          'ha1q34_6dtrunk_pcent_fat', 'male')
+  trp4 <- train_test_perf(predict(trunk_fat_male_xgb, dxa_train_male), 
+                          predict(trunk_fat_male_xgb, dxa_test_male),
+                          'ha1q34_6dtrunk_pcent_fat', 'male')
+  
+  
+  trp5 <- train_test_perf(dxa_train_female[,'ha1q37_11i_seg_tr_pcent'], 
+                          dxa_test_female[,'ha1q37_11i_seg_tr_pcent'], 
+                          'ha1q34_6dtrunk_pcent_fat', 'female')
+  trp6 <- train_test_perf(predict_enet(trunk_fat_female_lasso, dxa_train_female), 
+                          predict_enet(trunk_fat_female_lasso, dxa_test_female),
+                          'ha1q34_6dtrunk_pcent_fat', 'female')
+  trp7 <- train_test_perf(predict(trunk_fat_female_rf, dxa_train_female)$predictions, 
+                          predict(trunk_fat_female_rf, dxa_test_female)$predictions,
+                          'ha1q34_6dtrunk_pcent_fat', 'female')
+  trp8 <- train_test_perf(predict(trunk_fat_female_xgb, dxa_train_female), 
+                          predict(trunk_fat_female_xgb, dxa_test_female),
+                          'ha1q34_6dtrunk_pcent_fat', 'female')
+  
+  trunkpercent <- rbind(trp1, trp2, trp3, trp4, trp5, trp6, trp7, trp8)
+  
+  
+  trunkfat_perm = trunkfat_perm + trunkpercent
+  
+  # revert datasets to unpermuted version
+  dxa_train_male = dxa_train_male_save
+  dxa_test_male = dxa_test_male_save
+  dxa_train_female = dxa_train_female_save
+  dxa_test_female = dxa_test_female_save
+  
+}
 
-trp5 <- train_test_perf(dxa_train_female[,'ha1q37_11i_seg_tr_pcent'], 
-                        dxa_test_female[,'ha1q37_11i_seg_tr_pcent'], 
-                        'ha1q34_6dtrunk_pcent_fat', 'female')
-trp6 <- train_test_perf(predict_enet(trunk_fat_female_lasso, dxa_train_female), 
-                        predict_enet(trunk_fat_female_lasso, dxa_test_female),
-                        'ha1q34_6dtrunk_pcent_fat', 'female')
-trp7 <- train_test_perf(predict(trunk_fat_female_rf, dxa_train_female)$predictions, 
-                        predict(trunk_fat_female_rf, dxa_test_female)$predictions,
-                        'ha1q34_6dtrunk_pcent_fat', 'female')
-trp8 <- train_test_perf(predict(trunk_fat_female_xgb, dxa_train_female), 
-                        predict(trunk_fat_female_xgb, dxa_test_female),
-                        'ha1q34_6dtrunk_pcent_fat', 'female')
+trunkpercent = trunkfat_perm/100
+
 
 
 # Outcome = L1-L4 trunk fat percentage, ha1q34_12dl1l4_pcent1
 
-# Models
-l1_fat_male_lasso <- make_lasso('ha1q34_12dl1l4_pcent1', 'male')
-l1_fat_male_rf <- make_rf('ha1q34_12dl1l4_pcent1', 'male')
-l1_fat_male_xgb <- make_xgb('ha1q34_12dl1l4_pcent1', 'male')
-l1_fat_female_lasso <- make_lasso('ha1q34_12dl1l4_pcent1', 'female')
-l1_fat_female_rf <- make_rf('ha1q34_12dl1l4_pcent1', 'female')
-l1_fat_female_xgb <- make_xgb('ha1q34_12dl1l4_pcent1', 'female')
 
-# Performance
-# Trunk used as closest comparison from Tanita
-l11 <- train_test_perf(dxa_train_male[,'ha1q37_11i_seg_tr_pcent'], 
-                       dxa_test_male[,'ha1q37_11i_seg_tr_pcent'], 
-                       'ha1q34_12dl1l4_pcent1', 'male')
-l12 <- train_test_perf(predict_enet(l1_fat_male_lasso, dxa_train_male), 
-                       predict_enet(l1_fat_male_lasso, dxa_test_male),
-                       'ha1q34_12dl1l4_pcent1', 'male')
-l13 <- train_test_perf(predict(l1_fat_male_rf, dxa_train_male)$predictions, 
-                       predict(l1_fat_male_rf, dxa_test_male)$predictions,
-                       'ha1q34_12dl1l4_pcent1', 'male')
-l14 <- train_test_perf(predict(l1_fat_male_xgb, dxa_train_male), 
-                       predict(l1_fat_male_xgb, dxa_test_male),
-                       'ha1q34_12dl1l4_pcent1', 'male')
+set.seed(88)
 
+l1l4_perm = data.frame(RMSE_train	= numeric(8),
+                           MAE_train	= numeric(8),
+                           MAPE_train	= numeric(8),
+                           R2_train	= numeric(8),
+                           RMSE_test	= numeric(8),
+                           MAE_test	= numeric(8),
+                           MAPE_test	= numeric(8),
+                           R2_test	= numeric(8))
 
-l15 <- train_test_perf(dxa_train_female[,'ha1q37_11i_seg_tr_pcent'], 
-                       dxa_test_female[,'ha1q37_11i_seg_tr_pcent'], 
-                       'ha1q34_12dl1l4_pcent1', 'female')
-l16 <- train_test_perf(predict_enet(l1_fat_female_lasso, dxa_train_female), 
-                       predict_enet(l1_fat_female_lasso, dxa_test_female),
-                       'ha1q34_12dl1l4_pcent1', 'female')
-l17 <- train_test_perf(predict(l1_fat_female_rf, dxa_train_female)$predictions, 
-                       predict(l1_fat_female_rf, dxa_test_female)$predictions,
-                       'ha1q34_12dl1l4_pcent1', 'female')
-l18 <- train_test_perf(predict(l1_fat_female_xgb, dxa_train_female), 
-                       predict(l1_fat_female_xgb, dxa_test_female),
-                       'ha1q34_12dl1l4_pcent1', 'female')
+for(i in 1:100){
+  # Have backup copies of dataset from before permutation
+  dxa_train_male_save = dxa_train_male
+  dxa_test_male_save = dxa_test_male
+  dxa_train_female_save = dxa_train_female
+  dxa_test_female_save = dxa_test_female
+  
+  # Randomly sample order for males
+  new_order = sample(1:(length(c(dxa_train_male[,'ha1q34_12dl1l4_pcent1'], dxa_test_male[,'ha1q34_12dl1l4_pcent1']))),
+                     length(c(dxa_train_male[,'ha1q34_12dl1l4_pcent1'], dxa_test_male[,'ha1q34_12dl1l4_pcent1'])))
+  
+  
+  out_vec = c(dxa_train_male[,'ha1q34_12dl1l4_pcent1'], dxa_test_male[,'ha1q34_12dl1l4_pcent1'])
+  out_vec = out_vec[new_order]
+  
+  dxa_train_male[,'ha1q34_12dl1l4_pcent1']  = out_vec[1:nrow(dxa_train_male)]
+  dxa_test_male[,'ha1q34_12dl1l4_pcent1']  = out_vec[(nrow(dxa_train_male)+1):length(out_vec)]
+  
+  # Randomly sample order for females
+  new_order = sample(1:(length(c(dxa_train_female[,'ha1q34_12dl1l4_pcent1'], dxa_test_female[,'ha1q34_12dl1l4_pcent1']))),
+                     length(c(dxa_train_female[,'ha1q34_12dl1l4_pcent1'], dxa_test_female[,'ha1q34_12dl1l4_pcent1'])))
+  
+  
+  out_vec = c(dxa_train_female[,'ha1q34_12dl1l4_pcent1'], dxa_test_female[,'ha1q34_12dl1l4_pcent1'])
+  out_vec = out_vec[new_order]
+  
+  dxa_train_female[,'ha1q34_12dl1l4_pcent1']  = out_vec[1:nrow(dxa_train_female)]
+  dxa_test_female[,'ha1q34_12dl1l4_pcent1']  = out_vec[(nrow(dxa_train_female)+1):length(out_vec)]
+  
+  
+  
+  
+  
+  # Models
+  l1_fat_male_lasso <- make_lasso('ha1q34_12dl1l4_pcent1', 'male')
+  l1_fat_male_rf <- make_rf('ha1q34_12dl1l4_pcent1', 'male')
+  l1_fat_male_xgb <- make_xgb('ha1q34_12dl1l4_pcent1', 'male')
+  l1_fat_female_lasso <- make_lasso('ha1q34_12dl1l4_pcent1', 'female')
+  l1_fat_female_rf <- make_rf('ha1q34_12dl1l4_pcent1', 'female')
+  l1_fat_female_xgb <- make_xgb('ha1q34_12dl1l4_pcent1', 'female')
+  
+  # Performance
+  # Trunk used as closest comparison from Tanita
+  l11 <- train_test_perf(dxa_train_male[,'ha1q37_11i_seg_tr_pcent'], 
+                         dxa_test_male[,'ha1q37_11i_seg_tr_pcent'], 
+                         'ha1q34_12dl1l4_pcent1', 'male')
+  l12 <- train_test_perf(predict_enet(l1_fat_male_lasso, dxa_train_male), 
+                         predict_enet(l1_fat_male_lasso, dxa_test_male),
+                         'ha1q34_12dl1l4_pcent1', 'male')
+  l13 <- train_test_perf(predict(l1_fat_male_rf, dxa_train_male)$predictions, 
+                         predict(l1_fat_male_rf, dxa_test_male)$predictions,
+                         'ha1q34_12dl1l4_pcent1', 'male')
+  l14 <- train_test_perf(predict(l1_fat_male_xgb, dxa_train_male), 
+                         predict(l1_fat_male_xgb, dxa_test_male),
+                         'ha1q34_12dl1l4_pcent1', 'male')
+  
+  
+  l15 <- train_test_perf(dxa_train_female[,'ha1q37_11i_seg_tr_pcent'], 
+                         dxa_test_female[,'ha1q37_11i_seg_tr_pcent'], 
+                         'ha1q34_12dl1l4_pcent1', 'female')
+  l16 <- train_test_perf(predict_enet(l1_fat_female_lasso, dxa_train_female), 
+                         predict_enet(l1_fat_female_lasso, dxa_test_female),
+                         'ha1q34_12dl1l4_pcent1', 'female')
+  l17 <- train_test_perf(predict(l1_fat_female_rf, dxa_train_female)$predictions, 
+                         predict(l1_fat_female_rf, dxa_test_female)$predictions,
+                         'ha1q34_12dl1l4_pcent1', 'female')
+  l18 <- train_test_perf(predict(l1_fat_female_xgb, dxa_train_female), 
+                         predict(l1_fat_female_xgb, dxa_test_female),
+                         'ha1q34_12dl1l4_pcent1', 'female')
+  
+  l1results <- rbind(l11, l12, l13, l14, l15, l16, l17, l18)
+  
+  l1l4_perm = l1l4_perm + l1results
+  
+  
+  # revert datasets to unpermuted version
+  dxa_train_male = dxa_train_male_save
+  dxa_test_male = dxa_test_male_save
+  dxa_train_female = dxa_train_female_save
+  dxa_test_female = dxa_test_female_save
+  
+}
 
-l1results <- rbind(l11, l12, l13, l14, l15, l16, l17, l18)
+l1results = l1l4_perm/100
+
 
 # Outcome = appendicular lean mass, appendic_lean
 
 
-# Models
-app_lean_male_lasso <- make_lasso('appendic_lean', 'male')
-app_lean_male_rf <- make_rf('appendic_lean', 'male')
-app_lean_male_xgb <- make_xgb('appendic_lean', 'male')
-app_lean_female_lasso <- make_lasso('appendic_lean', 'female')
-app_lean_female_rf <- make_rf('appendic_lean', 'female')
-app_lean_female_xgb <- make_xgb('appendic_lean', 'female')
+set.seed(88)
 
-# Performance
-ap1 <- train_test_perf(1000*dxa_train_male[,'ha1q37_7iii_seg_rl_free_mass'] + 1000*dxa_train_male[,'ha1q37_8iii_seg_ll_free_mass'] + 1000*dxa_train_male[,'ha1q37_9iii_seg_ra_free_mass'] + 1000*dxa_train_male[,'ha1q37_10iii_seg_la_free_mass'], 
-                       1000*dxa_test_male[,'ha1q37_7iii_seg_rl_free_mass'] + 1000*dxa_test_male[,'ha1q37_8iii_seg_ll_free_mass'] + 1000*dxa_test_male[,'ha1q37_9iii_seg_ra_free_mass'] + 1000*dxa_test_male[,'ha1q37_10iii_seg_la_free_mass'], 
-                       'appendic_lean', 'male')
-ap2 <- train_test_perf(predict_enet(app_lean_male_lasso, dxa_train_male), 
-                       predict_enet(app_lean_male_lasso, dxa_test_male),
-                       'appendic_lean', 'male')
-ap3 <- train_test_perf(predict(app_lean_male_rf, dxa_train_male)$predictions, 
-                       predict(app_lean_male_rf, dxa_test_male)$predictions,
-                       'appendic_lean', 'male')
-ap4 <- train_test_perf(predict(app_lean_male_xgb, dxa_train_male), 
-                       predict(app_lean_male_xgb, dxa_test_male),
-                       'appendic_lean', 'male')
+app_perm = data.frame(RMSE_train	= numeric(8),
+                       MAE_train	= numeric(8),
+                       MAPE_train	= numeric(8),
+                       R2_train	= numeric(8),
+                       RMSE_test	= numeric(8),
+                       MAE_test	= numeric(8),
+                       MAPE_test	= numeric(8),
+                       R2_test	= numeric(8))
 
+for(i in 1:100){
+  # Have backup copies of dataset from before permutation
+  dxa_train_male_save = dxa_train_male
+  dxa_test_male_save = dxa_test_male
+  dxa_train_female_save = dxa_train_female
+  dxa_test_female_save = dxa_test_female
+  
+  # Randomly sample order for males
+  new_order = sample(1:(length(c(dxa_train_male[,'ha1q37_7iii_seg_rl_free_mass'], dxa_test_male[,'ha1q37_7iii_seg_rl_free_mass']))),
+                     length(c(dxa_train_male[,'ha1q37_7iii_seg_rl_free_mass'], dxa_test_male[,'ha1q37_7iii_seg_rl_free_mass'])))
+  
+  
+  out_vec = c(dxa_train_male[,'ha1q37_7iii_seg_rl_free_mass'], dxa_test_male[,'ha1q37_7iii_seg_rl_free_mass'])
+  out_vec = out_vec[new_order]
+  
+  dxa_train_male[,'ha1q37_7iii_seg_rl_free_mass']  = out_vec[1:nrow(dxa_train_male)]
+  dxa_test_male[,'ha1q37_7iii_seg_rl_free_mass']  = out_vec[(nrow(dxa_train_male)+1):length(out_vec)]
+  
+  # Randomly sample order for females
+  new_order = sample(1:(length(c(dxa_train_female[,'ha1q37_7iii_seg_rl_free_mass'], dxa_test_female[,'ha1q37_7iii_seg_rl_free_mass']))),
+                     length(c(dxa_train_female[,'ha1q37_7iii_seg_rl_free_mass'], dxa_test_female[,'ha1q37_7iii_seg_rl_free_mass'])))
+  
+  
+  out_vec = c(dxa_train_female[,'ha1q37_7iii_seg_rl_free_mass'], dxa_test_female[,'ha1q37_7iii_seg_rl_free_mass'])
+  out_vec = out_vec[new_order]
+  
+  dxa_train_female[,'ha1q37_7iii_seg_rl_free_mass']  = out_vec[1:nrow(dxa_train_female)]
+  dxa_test_female[,'ha1q37_7iii_seg_rl_free_mass']  = out_vec[(nrow(dxa_train_female)+1):length(out_vec)]
+  
+  
+  
+  
+  # Models
+  app_lean_male_lasso <- make_lasso('appendic_lean', 'male')
+  app_lean_male_rf <- make_rf('appendic_lean', 'male')
+  app_lean_male_xgb <- make_xgb('appendic_lean', 'male')
+  app_lean_female_lasso <- make_lasso('appendic_lean', 'female')
+  app_lean_female_rf <- make_rf('appendic_lean', 'female')
+  app_lean_female_xgb <- make_xgb('appendic_lean', 'female')
+  
+  # Performance
+  ap1 <- train_test_perf(1000*dxa_train_male[,'ha1q37_7iii_seg_rl_free_mass'] + 1000*dxa_train_male[,'ha1q37_8iii_seg_ll_free_mass'] + 1000*dxa_train_male[,'ha1q37_9iii_seg_ra_free_mass'] + 1000*dxa_train_male[,'ha1q37_10iii_seg_la_free_mass'], 
+                         1000*dxa_test_male[,'ha1q37_7iii_seg_rl_free_mass'] + 1000*dxa_test_male[,'ha1q37_8iii_seg_ll_free_mass'] + 1000*dxa_test_male[,'ha1q37_9iii_seg_ra_free_mass'] + 1000*dxa_test_male[,'ha1q37_10iii_seg_la_free_mass'], 
+                         'appendic_lean', 'male')
+  ap2 <- train_test_perf(predict_enet(app_lean_male_lasso, dxa_train_male), 
+                         predict_enet(app_lean_male_lasso, dxa_test_male),
+                         'appendic_lean', 'male')
+  ap3 <- train_test_perf(predict(app_lean_male_rf, dxa_train_male)$predictions, 
+                         predict(app_lean_male_rf, dxa_test_male)$predictions,
+                         'appendic_lean', 'male')
+  ap4 <- train_test_perf(predict(app_lean_male_xgb, dxa_train_male), 
+                         predict(app_lean_male_xgb, dxa_test_male),
+                         'appendic_lean', 'male')
+  
+  
+  ap5 <- train_test_perf(1000*dxa_train_female[,'ha1q37_7iii_seg_rl_free_mass'] + 1000*dxa_train_female[,'ha1q37_8iii_seg_ll_free_mass'] + 1000*dxa_train_female[,'ha1q37_9iii_seg_ra_free_mass'] + 1000*dxa_train_female[,'ha1q37_10iii_seg_la_free_mass'], 
+                         1000*dxa_test_female[,'ha1q37_7iii_seg_rl_free_mass'] + 1000*dxa_test_female[,'ha1q37_8iii_seg_ll_free_mass'] + 1000*dxa_test_female[,'ha1q37_9iii_seg_ra_free_mass'] + 1000*dxa_test_female[,'ha1q37_10iii_seg_la_free_mass'], 
+                         'appendic_lean', 'female')
+  ap6 <- train_test_perf(predict_enet(app_lean_female_lasso, dxa_train_female), 
+                         predict_enet(app_lean_female_lasso, dxa_test_female),
+                         'appendic_lean', 'female')
+  ap7 <- train_test_perf(predict(app_lean_female_rf, dxa_train_female)$predictions, 
+                         predict(app_lean_female_rf, dxa_test_female)$predictions,
+                         'appendic_lean', 'female')
+  ap8 <- train_test_perf(predict(app_lean_female_xgb, dxa_train_female), 
+                         predict(app_lean_female_xgb, dxa_test_female),
+                         'appendic_lean', 'female')
+  
+  
+  apresults <- rbind(ap1, ap2, ap3, ap4, ap5,
+                     ap6, ap7, ap8)
+  
+  
+  app_perm = app_perm + apresults
+  
+  
+  # revert datasets to unpermuted version
+  dxa_train_male = dxa_train_male_save
+  dxa_test_male = dxa_test_male_save
+  dxa_train_female = dxa_train_female_save
+  dxa_test_female = dxa_test_female_save
+  
+}
 
-ap5 <- train_test_perf(1000*dxa_train_female[,'ha1q37_7iii_seg_rl_free_mass'] + 1000*dxa_train_female[,'ha1q37_8iii_seg_ll_free_mass'] + 1000*dxa_train_female[,'ha1q37_9iii_seg_ra_free_mass'] + 1000*dxa_train_female[,'ha1q37_10iii_seg_la_free_mass'], 
-                       1000*dxa_test_female[,'ha1q37_7iii_seg_rl_free_mass'] + 1000*dxa_test_female[,'ha1q37_8iii_seg_ll_free_mass'] + 1000*dxa_test_female[,'ha1q37_9iii_seg_ra_free_mass'] + 1000*dxa_test_female[,'ha1q37_10iii_seg_la_free_mass'], 
-                       'appendic_lean', 'female')
-ap6 <- train_test_perf(predict_enet(app_lean_female_lasso, dxa_train_female), 
-                       predict_enet(app_lean_female_lasso, dxa_test_female),
-                       'appendic_lean', 'female')
-ap7 <- train_test_perf(predict(app_lean_female_rf, dxa_train_female)$predictions, 
-                       predict(app_lean_female_rf, dxa_test_female)$predictions,
-                       'appendic_lean', 'female')
-ap8 <- train_test_perf(predict(app_lean_female_xgb, dxa_train_female), 
-                       predict(app_lean_female_xgb, dxa_test_female),
-                       'appendic_lean', 'female')
-
-# Can also use Bharati's equations
-ap9 <- train_test_perf((as.numeric(-0.996 - (0.023*dxa_train_male$ha1dv_age) + (0.090*dxa_train_male$height/10)+ (0.274*dxa_train_male$ha1q37_2_weight) + (0.143*dxa_train_male$arm_circ/10) + (0.223*dxa_train_male$calf_circ/10) - (0.104*dxa_train_male$hip_circ/10) - (3.163*dxa_train_male$log_skin))*1000), 
-                       (as.numeric(-0.996 - (0.023*dxa_test_male$ha1dv_age) + (0.090*dxa_test_male$height/10)+ (0.274*dxa_test_male$ha1q37_2_weight) + (0.143*dxa_test_male$arm_circ/10) + (0.223*dxa_test_male$calf_circ/10) - (0.104*dxa_test_male$hip_circ/10) - (3.163*dxa_test_male$log_skin))*1000),
-                       'appendic_lean', 'male')
-
-ap10 <- train_test_perf(as.numeric(1.609 - (0.021*dxa_train_female$ha1dv_age) + (0.070*dxa_train_female$height/10)+ (0.250*dxa_train_female$ha1q37_2_weight) + (0.027*dxa_train_female$arm_circ/10) + (0.098*dxa_train_female$calf_circ/10) - (0.085*dxa_train_female$hip_circ/10) - (1.821*dxa_train_female$log_skin))*1000, 
-                        as.numeric(1.609 - (0.021*dxa_test_female$ha1dv_age) + (0.070*dxa_test_female$height/10)+ (0.250*dxa_test_female$ha1q37_2_weight) + (0.027*dxa_test_female$arm_circ/10) + (0.098*dxa_test_female$calf_circ/10) - (0.085*dxa_test_female$hip_circ/10) - (1.821*dxa_test_female$log_skin))*1000,
-                        'appendic_lean', 'female')
-
-apresults <- rbind(ap1, ap2, ap3, ap4, ap5,
-                   ap6, ap7, ap8, ap9, ap10)
+apresults = app_perm/100
 
 
 # Process results tables to make more legible
