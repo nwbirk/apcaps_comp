@@ -1272,3 +1272,74 @@ write.csv(trunkpercent, 'trunkfatpercentlessints_perm.csv')
 write.csv(l1results, 'l1l4fatpercentlessints_perm.csv')
 write.csv(apresults, 'appleanmasslessints_perm.csv')
 
+
+
+
+
+#########################
+# Get a better understanding of what results look like 
+# of such an analysis under different data generating mechanisms
+set.seed(99)
+errs = rnorm(1000)
+X1 = rnorm(1000)
+X2 = rnorm(1000)
+Y = 0.005*X1 + 0.008*X2 + errs # weak but real relationship
+
+fakedat = data.frame(X1 = X1,
+           X2 = X2,
+           Y = Y)
+
+train <- fakedat[1:800,]
+test <- fakedat[801:1000,]
+
+realmod <- lm(Y ~ X1 + X2, data = train)
+test$preds = predict(realmod, test)
+mean(abs(test$preds - test$Y))
+
+
+# Now reshuffle
+neworder = sample(1:1000, 1000)
+fakedat$Y = fakedat$Y[neworder]
+
+train <- fakedat[1:800,]
+test <- fakedat[801:1000,]
+
+realmod <- lm(Y ~ X1 + X2, data = train)
+test$preds = predict(realmod, test)
+mean(abs(test$preds - test$Y))
+summary(realmod)
+# MAE of fake data often smaller than real data
+# But coef estimates quite different
+
+
+# Get a better understanding
+set.seed(99)
+errs = rnorm(1000)
+X1 = rnorm(1000)
+X2 = rnorm(1000)
+Y = 0.5*X1 + 0.8*X2 + errs # real and strong relationship
+
+fakedat = data.frame(X1 = X1,
+                     X2 = X2,
+                     Y = Y)
+
+train <- fakedat[1:800,]
+test <- fakedat[801:1000,]
+
+realmod <- lm(Y ~ X1 + X2, data = train)
+test$preds = predict(realmod, test)
+mean(abs(test$preds - test$Y))
+
+
+# Now reshuffle
+neworder = sample(1:1000, 1000)
+fakedat$Y = fakedat$Y[neworder]
+
+train <- fakedat[1:800,]
+test <- fakedat[801:1000,]
+
+realmod <- lm(Y ~ X1 + X2, data = train)
+test$preds = predict(realmod, test)
+mean(abs(test$preds - test$Y))
+# Error often much larger in the fake data
+
