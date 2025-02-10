@@ -632,26 +632,26 @@ for(i in 1:100){
   dxa_test_female_save = dxa_test_female
   
   # Randomly sample order for males
-  new_order = sample(1:(length(c(dxa_train_male[,'ha1q37_5ii_tbf_mass'], dxa_test_male[,'ha1q37_5ii_tbf_mass']))),
-                     length(c(dxa_train_male[,'ha1q37_5ii_tbf_mass'], dxa_test_male[,'ha1q37_5ii_tbf_mass'])))
+  new_order = sample(1:(length(c(dxa_train_male[,'ha1q34_9atotal_fat'], dxa_test_male[,'ha1q34_9atotal_fat']))),
+                     length(c(dxa_train_male[,'ha1q34_9atotal_fat'], dxa_test_male[,'ha1q34_9atotal_fat'])))
   
   
-  out_vec = c(dxa_train_male[,'ha1q37_5ii_tbf_mass'], dxa_test_male[,'ha1q37_5ii_tbf_mass'])
+  out_vec = c(dxa_train_male[,'ha1q34_9atotal_fat'], dxa_test_male[,'ha1q34_9atotal_fat'])
   out_vec = out_vec[new_order]
   
-  dxa_train_male[,'ha1q37_5ii_tbf_mass']  = out_vec[1:nrow(dxa_train_male)]
-  dxa_test_male[,'ha1q37_5ii_tbf_mass']  = out_vec[(nrow(dxa_train_male)+1):length(out_vec)]
+  dxa_train_male[,'ha1q34_9atotal_fat']  = out_vec[1:nrow(dxa_train_male)]
+  dxa_test_male[,'ha1q34_9atotal_fat']  = out_vec[(nrow(dxa_train_male)+1):length(out_vec)]
   
   # Randomly sample order for females
-  new_order = sample(1:(length(c(dxa_train_female[,'ha1q37_5ii_tbf_mass'], dxa_test_female[,'ha1q37_5ii_tbf_mass']))),
-                     length(c(dxa_train_female[,'ha1q37_5ii_tbf_mass'], dxa_test_female[,'ha1q37_5ii_tbf_mass'])))
+  new_order = sample(1:(length(c(dxa_train_female[,'ha1q34_9atotal_fat'], dxa_test_female[,'ha1q34_9atotal_fat']))),
+                     length(c(dxa_train_female[,'ha1q34_9atotal_fat'], dxa_test_female[,'ha1q34_9atotal_fat'])))
   
   
-  out_vec = c(dxa_train_female[,'ha1q37_5ii_tbf_mass'], dxa_test_female[,'ha1q37_5ii_tbf_mass'])
+  out_vec = c(dxa_train_female[,'ha1q34_9atotal_fat'], dxa_test_female[,'ha1q34_9atotal_fat'])
   out_vec = out_vec[new_order]
   
-  dxa_train_female[,'ha1q37_5ii_tbf_mass']  = out_vec[1:nrow(dxa_train_female)]
-  dxa_test_female[,'ha1q37_5ii_tbf_mass']  = out_vec[(nrow(dxa_train_female)+1):length(out_vec)]
+  dxa_train_female[,'ha1q34_9atotal_fat']  = out_vec[1:nrow(dxa_train_female)]
+  dxa_test_female[,'ha1q34_9atotal_fat']  = out_vec[(nrow(dxa_train_female)+1):length(out_vec)]
   
   
   # Models
