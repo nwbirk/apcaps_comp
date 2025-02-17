@@ -706,6 +706,18 @@ for(i in 1:25){
 totalfatresults = totalfat_perm / 25
 
 
+totalfatresults[,1] <- round(totalfatresults[,1]/1000, 2)
+totalfatresults[,2] <- round(totalfatresults[,2]/1000, 3)
+totalfatresults[,3] <- round(totalfatresults[,3]*100, 2)
+totalfatresults[,4] <- round(totalfatresults[,4], 3)
+totalfatresults[,5] <- round(totalfatresults[,5]/1000, 2)
+totalfatresults[,6] <- round(totalfatresults[,6]/1000, 3)
+totalfatresults[,7] <- round(totalfatresults[,7]*100, 2)
+totalfatresults[,8] <- round(totalfatresults[,8], 3)
+
+write.csv(totalfatresults, 'totalfatmasslessints_perm.csv')
+
+
 
 # Outcome = Total body lean mass, ha1q34_9btotal_lean
 
@@ -720,7 +732,7 @@ totallean_perm = data.frame(RMSE_train	= numeric(8),
                            MAPE_test	= numeric(8),
                            R2_test	= numeric(8))
 
-for(i in 1:100){
+for(i in 1:25){
   # Have backup copies of dataset from before permutation
   dxa_train_male_save = dxa_train_male
   dxa_test_male_save = dxa_test_male
@@ -801,7 +813,20 @@ for(i in 1:100){
   
 }
 
-totalleanresults = totallean_perm/100
+totalleanresults = totallean_perm/25
+
+
+
+totalleanresults[,1] <- round(totalleanresults[,1]/1000, 2)
+totalleanresults[,2] <- round(totalleanresults[,2]/1000, 3)
+totalleanresults[,3] <- round(totalleanresults[,3]*100, 2)
+totalleanresults[,4] <- round(totalleanresults[,4], 3)
+totalleanresults[,5] <- round(totalleanresults[,5]/1000, 2)
+totalleanresults[,6] <- round(totalleanresults[,6]/1000, 3)
+totalleanresults[,7] <- round(totalleanresults[,7]*100, 2)
+totalleanresults[,8] <- round(totalleanresults[,8], 3)
+
+write.csv(totalleanresults, 'totalleanmasslessints_perm.csv')
 
 
 
@@ -819,7 +844,7 @@ totalfatp_perm = data.frame(RMSE_train	= numeric(8),
                             MAPE_test	= numeric(8),
                             R2_test	= numeric(8))
 
-for(i in 1:100){
+for(i in 1:25){
   # Have backup copies of dataset from before permutation
   dxa_train_male_save = dxa_train_male
   dxa_test_male_save = dxa_test_male
@@ -900,7 +925,19 @@ for(i in 1:100){
   
 }
 
-totalfatpresults=totalfatp_perm/100
+totalfatpresults=totalfatp_perm/25
+
+
+totalfatpresults[,1] <- round(totalfatpresults[,1], 3)
+totalfatpresults[,2] <- round(totalfatpresults[,2], 3)
+totalfatpresults[,3] <- round(totalfatpresults[,3]*100, 2)
+totalfatpresults[,4] <- round(totalfatpresults[,4], 3)
+totalfatpresults[,5] <- round(totalfatpresults[,5], 3)
+totalfatpresults[,6] <- round(totalfatpresults[,6], 3)
+totalfatpresults[,7] <- round(totalfatpresults[,7]*100, 2)
+totalfatpresults[,8] <- round(totalfatpresults[,8], 3)
+
+write.csv(totalfatpresults, 'totalfatpercentlessints_perm.csv')
 
 
 
@@ -917,7 +954,7 @@ trunkfat_perm = data.frame(RMSE_train	= numeric(8),
                             MAPE_test	= numeric(8),
                             R2_test	= numeric(8))
 
-for(i in 1:100){
+for(i in 1:25){
   # Have backup copies of dataset from before permutation
   dxa_train_male_save = dxa_train_male
   dxa_test_male_save = dxa_test_male
@@ -998,8 +1035,19 @@ for(i in 1:100){
   
 }
 
-trunkpercent = trunkfat_perm/100
+trunkpercent = trunkfat_perm/25
 
+
+trunkpercent[,1] <- round(trunkpercent[,1], 3)
+trunkpercent[,2] <- round(trunkpercent[,2], 3)
+trunkpercent[,3] <- round(trunkpercent[,3]*100, 2)
+trunkpercent[,4] <- round(trunkpercent[,4], 3)
+trunkpercent[,5] <- round(trunkpercent[,5], 3)
+trunkpercent[,6] <- round(trunkpercent[,6], 3)
+trunkpercent[,7] <- round(trunkpercent[,7]*100, 2)
+trunkpercent[,8] <- round(trunkpercent[,8], 3)
+
+write.csv(trunkpercent, 'trunkfatpercentlessints_perm.csv')
 
 
 # Outcome = L1-L4 trunk fat percentage, ha1q34_12dl1l4_pcent1
@@ -1016,7 +1064,7 @@ l1l4_perm = data.frame(RMSE_train	= numeric(8),
                            MAPE_test	= numeric(8),
                            R2_test	= numeric(8))
 
-for(i in 1:100){
+for(i in 1:25){
   # Have backup copies of dataset from before permutation
   dxa_train_male_save = dxa_train_male
   dxa_test_male_save = dxa_test_male
@@ -1099,7 +1147,18 @@ for(i in 1:100){
   
 }
 
-l1results = l1l4_perm/100
+l1results = l1l4_perm/25
+
+l1results[,1] <- round(l1results[,1], 3)
+l1results[,2] <- round(l1results[,2], 3)
+l1results[,3] <- round(l1results[,3]*100, 2)
+l1results[,4] <- round(l1results[,4], 3)
+l1results[,5] <- round(l1results[,5], 3)
+l1results[,6] <- round(l1results[,6], 3)
+l1results[,7] <- round(l1results[,7]*100, 2)
+l1results[,8] <- round(l1results[,8], 3)
+
+write.csv(l1results, 'l1l4fatpercentlessints_perm.csv')
 
 
 # Outcome = appendicular lean mass, appendic_lean
@@ -1116,7 +1175,7 @@ app_perm = data.frame(RMSE_train	= numeric(8),
                        MAPE_test	= numeric(8),
                        R2_test	= numeric(8))
 
-for(i in 1:100){
+for(i in 1:25){
   # Have backup copies of dataset from before permutation
   dxa_train_male_save = dxa_train_male
   dxa_test_male_save = dxa_test_male
@@ -1200,32 +1259,8 @@ for(i in 1:100){
   
 }
 
-apresults = app_perm/100
+apresults = app_perm/25
 
-
-# Process results tables to make more legible
-# Convert grams units to kg
-# Convert percents to percents (XX.X% not 0.XXX%)
-# round decimals to sensible number for each
-
-totalfatresults[,1] <- round(totalfatresults[,1]/1000, 2)
-totalfatresults[,2] <- round(totalfatresults[,2]/1000, 3)
-totalfatresults[,3] <- round(totalfatresults[,3]*100, 2)
-totalfatresults[,4] <- round(totalfatresults[,4], 3)
-totalfatresults[,5] <- round(totalfatresults[,5]/1000, 2)
-totalfatresults[,6] <- round(totalfatresults[,6]/1000, 3)
-totalfatresults[,7] <- round(totalfatresults[,7]*100, 2)
-totalfatresults[,8] <- round(totalfatresults[,8], 3)
-
-
-totalleanresults[,1] <- round(totalleanresults[,1]/1000, 2)
-totalleanresults[,2] <- round(totalleanresults[,2]/1000, 3)
-totalleanresults[,3] <- round(totalleanresults[,3]*100, 2)
-totalleanresults[,4] <- round(totalleanresults[,4], 3)
-totalleanresults[,5] <- round(totalleanresults[,5]/1000, 2)
-totalleanresults[,6] <- round(totalleanresults[,6]/1000, 3)
-totalleanresults[,7] <- round(totalleanresults[,7]*100, 2)
-totalleanresults[,8] <- round(totalleanresults[,8], 3)
 
 apresults[,1] <- round(apresults[,1]/1000, 2)
 apresults[,2] <- round(apresults[,2]/1000, 3)
@@ -1236,42 +1271,22 @@ apresults[,6] <- round(apresults[,6]/1000, 3)
 apresults[,7] <- round(apresults[,7]*100, 2)
 apresults[,8] <- round(apresults[,8], 3)
 
+write.csv(apresults, 'appleanmasslessints_perm.csv')
 
-totalfatpresults[,1] <- round(totalfatpresults[,1], 3)
-totalfatpresults[,2] <- round(totalfatpresults[,2], 3)
-totalfatpresults[,3] <- round(totalfatpresults[,3]*100, 2)
-totalfatpresults[,4] <- round(totalfatpresults[,4], 3)
-totalfatpresults[,5] <- round(totalfatpresults[,5], 3)
-totalfatpresults[,6] <- round(totalfatpresults[,6], 3)
-totalfatpresults[,7] <- round(totalfatpresults[,7]*100, 2)
-totalfatpresults[,8] <- round(totalfatpresults[,8], 3)
 
-trunkpercent[,1] <- round(trunkpercent[,1], 3)
-trunkpercent[,2] <- round(trunkpercent[,2], 3)
-trunkpercent[,3] <- round(trunkpercent[,3]*100, 2)
-trunkpercent[,4] <- round(trunkpercent[,4], 3)
-trunkpercent[,5] <- round(trunkpercent[,5], 3)
-trunkpercent[,6] <- round(trunkpercent[,6], 3)
-trunkpercent[,7] <- round(trunkpercent[,7]*100, 2)
-trunkpercent[,8] <- round(trunkpercent[,8], 3)
-
-l1results[,1] <- round(l1results[,1], 3)
-l1results[,2] <- round(l1results[,2], 3)
-l1results[,3] <- round(l1results[,3]*100, 2)
-l1results[,4] <- round(l1results[,4], 3)
-l1results[,5] <- round(l1results[,5], 3)
-l1results[,6] <- round(l1results[,6], 3)
-l1results[,7] <- round(l1results[,7]*100, 2)
-l1results[,8] <- round(l1results[,8], 3)
+# Process results tables to make more legible
+# Convert grams units to kg
+# Convert percents to percents (XX.X% not 0.XXX%)
+# round decimals to sensible number for each
 
 
 # EXPORT RESULTS
-write.csv(totalfatresults, 'totalfatmasslessints_perm.csv')
-write.csv(totalleanresults, 'totalleanmasslessints_perm.csv')
-write.csv(totalfatpresults, 'totalfatpercentlessints_perm.csv')
-write.csv(trunkpercent, 'trunkfatpercentlessints_perm.csv')
-write.csv(l1results, 'l1l4fatpercentlessints_perm.csv')
-write.csv(apresults, 'appleanmasslessints_perm.csv')
+
+
+
+
+
+
 
 
 
