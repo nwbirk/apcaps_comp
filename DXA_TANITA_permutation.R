@@ -624,7 +624,7 @@ totalfat_perm = data.frame(RMSE_train	= numeric(8),
                            MAPE_test	= numeric(8),
                            R2_test	= numeric(8))
 
-for(i in 1:100){
+for(i in 1:25){
   # Have backup copies of dataset from before permutation
   dxa_train_male_save = dxa_train_male
   dxa_test_male_save = dxa_test_male
@@ -700,9 +700,10 @@ for(i in 1:100){
   dxa_train_female = dxa_train_female_save
   dxa_test_female = dxa_test_female_save
   
+  print(i)
 }
 
-totalfatresults = totalfat_perm / 100
+totalfatresults = totalfat_perm / 25
 
 
 
