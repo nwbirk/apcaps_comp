@@ -805,6 +805,7 @@ for(i in 1:25){
   
   totallean_perm = totallean_perm + totalleanresults
   
+  
   # revert datasets to unpermuted version
   dxa_train_male = dxa_train_male_save
   dxa_test_male = dxa_test_male_save
@@ -834,6 +835,8 @@ write.csv(totalleanresults, 'totalleanmasslessints_perm.csv')
 
 
 set.seed(88)
+fatp_res_male = numeric(25)
+fatp_res_female = numeric(25)
 
 totalfatp_perm = data.frame(RMSE_train	= numeric(8),
                             MAE_train	= numeric(8),
@@ -913,7 +916,9 @@ for(i in 1:25){
   
   totalfatpresults <- rbind(tfp1, tfp2, tfp3, tfp4, tfp5, tfp6, tfp7, tfp8)
   
-  
+  # do this for some idea of SE
+  fatp_res_male[i] = totalfatpresults[2,6]
+  fatp_res_female[i] = totalfatpresults[6,6]
   
   totalfatp_perm = totalfatp_perm + totalfatpresults
   
@@ -936,6 +941,8 @@ totalfatpresults[,5] <- round(totalfatpresults[,5], 3)
 totalfatpresults[,6] <- round(totalfatpresults[,6], 3)
 totalfatpresults[,7] <- round(totalfatpresults[,7]*100, 2)
 totalfatpresults[,8] <- round(totalfatpresults[,8], 3)
+sd(fatp_res_male)
+sd(fatp_res_female)
 
 write.csv(totalfatpresults, 'totalfatpercentlessints_perm.csv')
 
@@ -944,6 +951,9 @@ write.csv(totalfatpresults, 'totalfatpercentlessints_perm.csv')
 # Outcome = Trunk percentage fat mass, ha1q34_6dtrunk_pcent_fat
 
 set.seed(88)
+
+trunk_res_male = numeric(25)
+trunk_res_female = numeric(25)
 
 trunkfat_perm = data.frame(RMSE_train	= numeric(8),
                             MAE_train	= numeric(8),
@@ -1025,6 +1035,10 @@ for(i in 1:25){
   trunkpercent <- rbind(trp1, trp2, trp3, trp4, trp5, trp6, trp7, trp8)
   
   
+  # do this for some idea of SE
+  trunk_res_male[i] = trunkpercent[2,6]
+  trunk_res_female[i] = trunkpercent[6,6]
+  
   trunkfat_perm = trunkfat_perm + trunkpercent
   
   # revert datasets to unpermuted version
@@ -1046,6 +1060,8 @@ trunkpercent[,5] <- round(trunkpercent[,5], 3)
 trunkpercent[,6] <- round(trunkpercent[,6], 3)
 trunkpercent[,7] <- round(trunkpercent[,7]*100, 2)
 trunkpercent[,8] <- round(trunkpercent[,8], 3)
+sd(trunk_res_male)
+sd(trunk_res_female)
 
 write.csv(trunkpercent, 'trunkfatpercentlessints_perm.csv')
 
