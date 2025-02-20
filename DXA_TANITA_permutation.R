@@ -5,7 +5,7 @@
 # But outcome values will randomly be permuted
 
 library(readstata13)
-library(tidyverse)
+library(tidyverse) 
 library(mice)
 library(caret)
 library(ranger)
@@ -723,6 +723,9 @@ write.csv(totalfatresults, 'totalfatmasslessints_perm.csv')
 
 set.seed(88)
 
+lean_res_male = numeric(25)
+lean_res_female = numeric(25)
+
 totallean_perm = data.frame(RMSE_train	= numeric(8),
                            MAE_train	= numeric(8),
                            MAPE_train	= numeric(8),
@@ -803,6 +806,10 @@ for(i in 1:25){
                             tlm6, tlm7, tlm8)
   
   
+  # do this for some idea of SE
+  lean_res_male[i] = totalleanresults[2,6]
+  lean_res_female[i] = totalleanresults[6,6]
+  
   totallean_perm = totallean_perm + totalleanresults
   
   
@@ -826,6 +833,8 @@ totalleanresults[,5] <- round(totalleanresults[,5]/1000, 2)
 totalleanresults[,6] <- round(totalleanresults[,6]/1000, 3)
 totalleanresults[,7] <- round(totalleanresults[,7]*100, 2)
 totalleanresults[,8] <- round(totalleanresults[,8], 3)
+sd(lean_res_male)
+sd(lean_res_female)
 
 write.csv(totalleanresults, 'totalleanmasslessints_perm.csv')
 
@@ -1071,6 +1080,9 @@ write.csv(trunkpercent, 'trunkfatpercentlessints_perm.csv')
 
 set.seed(88)
 
+l1_res_male = numeric(25)
+l1_res_female = numeric(25)
+
 l1l4_perm = data.frame(RMSE_train	= numeric(8),
                            MAE_train	= numeric(8),
                            MAPE_train	= numeric(8),
@@ -1152,6 +1164,13 @@ for(i in 1:25){
   
   l1results <- rbind(l11, l12, l13, l14, l15, l16, l17, l18)
   
+  
+  
+  # do this for some idea of SE
+  l1_res_male[i] = l1results[2,6]
+  l1_res_female[i] = l1results[6,6]
+  
+  
   l1l4_perm = l1l4_perm + l1results
   
   
@@ -1173,6 +1192,8 @@ l1results[,5] <- round(l1results[,5], 3)
 l1results[,6] <- round(l1results[,6], 3)
 l1results[,7] <- round(l1results[,7]*100, 2)
 l1results[,8] <- round(l1results[,8], 3)
+sd(l1_res_male)
+sd(l1_res_female)
 
 write.csv(l1results, 'l1l4fatpercentlessints_perm.csv')
 
@@ -1181,6 +1202,9 @@ write.csv(l1results, 'l1l4fatpercentlessints_perm.csv')
 
 
 set.seed(88)
+
+ap_res_female = numeric(25)
+ap_res_female = numeric(25)
 
 app_perm = data.frame(RMSE_train	= numeric(8),
                        MAE_train	= numeric(8),
@@ -1264,6 +1288,10 @@ for(i in 1:25){
                      ap6, ap7, ap8)
   
   
+  # do this for some idea of SE
+  ap_res_male[i] = apresults[2,6]
+  ap_res_female[i] = apresults[6,6]
+  
   app_perm = app_perm + apresults
   
   
@@ -1286,6 +1314,9 @@ apresults[,5] <- round(apresults[,5]/1000, 2)
 apresults[,6] <- round(apresults[,6]/1000, 3)
 apresults[,7] <- round(apresults[,7]*100, 2)
 apresults[,8] <- round(apresults[,8], 3)
+
+sd(ap_res_male)
+sd(ap_res_female)
 
 write.csv(apresults, 'appleanmasslessints_perm.csv')
 
