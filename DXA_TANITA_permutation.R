@@ -1203,7 +1203,7 @@ write.csv(l1results, 'l1l4fatpercentlessints_perm.csv')
 
 set.seed(88)
 
-ap_res_female = numeric(25)
+ap_res_male = numeric(25)
 ap_res_female = numeric(25)
 
 app_perm = data.frame(RMSE_train	= numeric(8),
