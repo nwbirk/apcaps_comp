@@ -1223,26 +1223,26 @@ for(i in 1:25){
   dxa_test_female_save = dxa_test_female
   
   # Randomly sample order for males
-  new_order = sample(1:(length(c(dxa_train_male[,'ha1q37_7iii_seg_rl_free_mass'], dxa_test_male[,'ha1q37_7iii_seg_rl_free_mass']))),
-                     length(c(dxa_train_male[,'ha1q37_7iii_seg_rl_free_mass'], dxa_test_male[,'ha1q37_7iii_seg_rl_free_mass'])))
+  new_order = sample(1:(length(c(dxa_train_male[,'appendic_lean'], dxa_test_male[,'appendic_lean']))),
+                     length(c(dxa_train_male[,'appendic_lean'], dxa_test_male[,'appendic_lean'])))
   
   
-  out_vec = c(dxa_train_male[,'ha1q37_7iii_seg_rl_free_mass'], dxa_test_male[,'ha1q37_7iii_seg_rl_free_mass'])
+  out_vec = c(dxa_train_male[,'appendic_lean'], dxa_test_male[,'appendic_lean'])
   out_vec = out_vec[new_order]
   
-  dxa_train_male[,'ha1q37_7iii_seg_rl_free_mass']  = out_vec[1:nrow(dxa_train_male)]
-  dxa_test_male[,'ha1q37_7iii_seg_rl_free_mass']  = out_vec[(nrow(dxa_train_male)+1):length(out_vec)]
+  dxa_train_male[,'appendic_lean']  = out_vec[1:nrow(dxa_train_male)]
+  dxa_test_male[,'appendic_lean']  = out_vec[(nrow(dxa_train_male)+1):length(out_vec)]
   
   # Randomly sample order for females
-  new_order = sample(1:(length(c(dxa_train_female[,'ha1q37_7iii_seg_rl_free_mass'], dxa_test_female[,'ha1q37_7iii_seg_rl_free_mass']))),
-                     length(c(dxa_train_female[,'ha1q37_7iii_seg_rl_free_mass'], dxa_test_female[,'ha1q37_7iii_seg_rl_free_mass'])))
+  new_order = sample(1:(length(c(dxa_train_female[,'appendic_lean'], dxa_test_female[,'appendic_lean']))),
+                     length(c(dxa_train_female[,'appendic_lean'], dxa_test_female[,'appendic_lean'])))
   
   
-  out_vec = c(dxa_train_female[,'ha1q37_7iii_seg_rl_free_mass'], dxa_test_female[,'ha1q37_7iii_seg_rl_free_mass'])
+  out_vec = c(dxa_train_female[,'appendic_lean'], dxa_test_female[,'appendic_lean'])
   out_vec = out_vec[new_order]
   
-  dxa_train_female[,'ha1q37_7iii_seg_rl_free_mass']  = out_vec[1:nrow(dxa_train_female)]
-  dxa_test_female[,'ha1q37_7iii_seg_rl_free_mass']  = out_vec[(nrow(dxa_train_female)+1):length(out_vec)]
+  dxa_train_female[,'appendic_lean']  = out_vec[1:nrow(dxa_train_female)]
+  dxa_test_female[,'appendic_lean']  = out_vec[(nrow(dxa_train_female)+1):length(out_vec)]
   
   
   
