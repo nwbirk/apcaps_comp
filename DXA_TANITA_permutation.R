@@ -615,6 +615,9 @@ predict_enet <- function(model, dataset){
 
 set.seed(88)
 
+fat_res_male = numeric(25)
+fat_res_female = numeric(25)
+
 totalfat_perm = data.frame(RMSE_train	= numeric(8),
                            MAE_train	= numeric(8),
                            MAPE_train	= numeric(8),
@@ -692,6 +695,11 @@ for(i in 1:25){
   
   totalfatresults <- rbind(tfm1, tfm2, tfm3, tfm4, tfm5, tfm6, tfm7, tfm8)
   
+  
+  # do this for some idea of SE
+  fat_res_male[i] = totalfatresults[2,6]
+  fat_res_female[i] = totalfatresults[6,6]
+  
   totalfat_perm = totalfat_perm + totalfatresults
   
   # revert datasets to unpermuted version
@@ -714,6 +722,9 @@ totalfatresults[,5] <- round(totalfatresults[,5]/1000, 2)
 totalfatresults[,6] <- round(totalfatresults[,6]/1000, 3)
 totalfatresults[,7] <- round(totalfatresults[,7]*100, 2)
 totalfatresults[,8] <- round(totalfatresults[,8], 3)
+
+sd(fat_res_male/1000)
+sd(fat_res_female/1000)
 
 write.csv(totalfatresults, 'totalfatmasslessints_perm.csv')
 
