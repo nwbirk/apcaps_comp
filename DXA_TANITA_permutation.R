@@ -728,6 +728,364 @@ sd(fat_res_female/1000)
 
 write.csv(totalfatresults, 'totalfatmasslessints_perm.csv')
 
+# We can get to 100 runs by doing this 3 more times with different seeds
+
+
+set.seed(77)
+
+fat_res_male = numeric(25)
+fat_res_female = numeric(25)
+
+totalfat_perm = data.frame(RMSE_train	= numeric(8),
+                           MAE_train	= numeric(8),
+                           MAPE_train	= numeric(8),
+                           R2_train	= numeric(8),
+                           RMSE_test	= numeric(8),
+                           MAE_test	= numeric(8),
+                           MAPE_test	= numeric(8),
+                           R2_test	= numeric(8))
+
+for(i in 1:25){
+  # Have backup copies of dataset from before permutation
+  dxa_train_male_save = dxa_train_male
+  dxa_test_male_save = dxa_test_male
+  dxa_train_female_save = dxa_train_female
+  dxa_test_female_save = dxa_test_female
+  
+  # Randomly sample order for males
+  new_order = sample(1:(length(c(dxa_train_male[,'ha1q34_9atotal_fat'], dxa_test_male[,'ha1q34_9atotal_fat']))),
+                     length(c(dxa_train_male[,'ha1q34_9atotal_fat'], dxa_test_male[,'ha1q34_9atotal_fat'])))
+  
+  
+  out_vec = c(dxa_train_male[,'ha1q34_9atotal_fat'], dxa_test_male[,'ha1q34_9atotal_fat'])
+  out_vec = out_vec[new_order]
+  
+  dxa_train_male[,'ha1q34_9atotal_fat']  = out_vec[1:nrow(dxa_train_male)]
+  dxa_test_male[,'ha1q34_9atotal_fat']  = out_vec[(nrow(dxa_train_male)+1):length(out_vec)]
+  
+  # Randomly sample order for females
+  new_order = sample(1:(length(c(dxa_train_female[,'ha1q34_9atotal_fat'], dxa_test_female[,'ha1q34_9atotal_fat']))),
+                     length(c(dxa_train_female[,'ha1q34_9atotal_fat'], dxa_test_female[,'ha1q34_9atotal_fat'])))
+  
+  
+  out_vec = c(dxa_train_female[,'ha1q34_9atotal_fat'], dxa_test_female[,'ha1q34_9atotal_fat'])
+  out_vec = out_vec[new_order]
+  
+  dxa_train_female[,'ha1q34_9atotal_fat']  = out_vec[1:nrow(dxa_train_female)]
+  dxa_test_female[,'ha1q34_9atotal_fat']  = out_vec[(nrow(dxa_train_female)+1):length(out_vec)]
+  
+  
+  # Models
+  tot_fat_male_lasso <- make_lasso('ha1q34_9atotal_fat', 'male')
+  tot_fat_male_rf <- make_rf('ha1q34_9atotal_fat', 'male')
+  tot_fat_male_xgb <- make_xgb('ha1q34_9atotal_fat', 'male')
+  tot_fat_female_lasso <- make_lasso('ha1q34_9atotal_fat', 'female')
+  tot_fat_female_rf <- make_rf('ha1q34_9atotal_fat', 'female')
+  tot_fat_female_xgb <- make_xgb('ha1q34_9atotal_fat', 'female')
+  
+  # Performance
+  tfm1 <- train_test_perf(1000*dxa_train_male[,'ha1q37_5ii_tbf_mass'], 
+                          1000*dxa_test_male[,'ha1q37_5ii_tbf_mass'], 
+                          'ha1q34_9atotal_fat', 'male')
+  tfm2 <- train_test_perf(predict_enet(tot_fat_male_lasso, dxa_train_male), 
+                          predict_enet(tot_fat_male_lasso, dxa_test_male),
+                          'ha1q34_9atotal_fat', 'male')
+  tfm3 <- train_test_perf(predict(tot_fat_male_rf, dxa_train_male)$predictions, 
+                          predict(tot_fat_male_rf, dxa_test_male)$predictions,
+                          'ha1q34_9atotal_fat', 'male')
+  tfm4 <- train_test_perf(predict(tot_fat_male_xgb, dxa_train_male), 
+                          predict(tot_fat_male_xgb, dxa_test_male),
+                          'ha1q34_9atotal_fat', 'male')
+  
+  
+  tfm5 <- train_test_perf(1000*dxa_train_female[,'ha1q37_5ii_tbf_mass'], 
+                          1000*dxa_test_female[,'ha1q37_5ii_tbf_mass'], 
+                          'ha1q34_9atotal_fat', 'female')
+  tfm6 <- train_test_perf(predict_enet(tot_fat_female_lasso, dxa_train_female), 
+                          predict_enet(tot_fat_female_lasso, dxa_test_female),
+                          'ha1q34_9atotal_fat', 'female')
+  tfm7 <- train_test_perf(predict(tot_fat_female_rf, dxa_train_female)$predictions, 
+                          predict(tot_fat_female_rf, dxa_test_female)$predictions,
+                          'ha1q34_9atotal_fat', 'female')
+  tfm8 <- train_test_perf(predict(tot_fat_female_xgb, dxa_train_female), 
+                          predict(tot_fat_female_xgb, dxa_test_female),
+                          'ha1q34_9atotal_fat', 'female')
+  
+  totalfatresults <- rbind(tfm1, tfm2, tfm3, tfm4, tfm5, tfm6, tfm7, tfm8)
+  
+  
+  # do this for some idea of SE
+  fat_res_male[i] = totalfatresults[2,6]
+  fat_res_female[i] = totalfatresults[6,6]
+  
+  totalfat_perm = totalfat_perm + totalfatresults
+  
+  # revert datasets to unpermuted version
+  dxa_train_male = dxa_train_male_save
+  dxa_test_male = dxa_test_male_save
+  dxa_train_female = dxa_train_female_save
+  dxa_test_female = dxa_test_female_save
+  
+  print(i)
+}
+
+totalfatresults = totalfat_perm / 25
+
+
+totalfatresults[,1] <- round(totalfatresults[,1]/1000, 2)
+totalfatresults[,2] <- round(totalfatresults[,2]/1000, 3)
+totalfatresults[,3] <- round(totalfatresults[,3]*100, 2)
+totalfatresults[,4] <- round(totalfatresults[,4], 3)
+totalfatresults[,5] <- round(totalfatresults[,5]/1000, 2)
+totalfatresults[,6] <- round(totalfatresults[,6]/1000, 3)
+totalfatresults[,7] <- round(totalfatresults[,7]*100, 2)
+totalfatresults[,8] <- round(totalfatresults[,8], 3)
+
+sd(fat_res_male/1000)
+sd(fat_res_female/1000)
+
+write.csv(totalfatresults, 'totalfatmasslessints_perm2.csv')
+
+
+# Part 3
+
+
+set.seed(66)
+
+fat_res_male = numeric(25)
+fat_res_female = numeric(25)
+
+totalfat_perm = data.frame(RMSE_train	= numeric(8),
+                           MAE_train	= numeric(8),
+                           MAPE_train	= numeric(8),
+                           R2_train	= numeric(8),
+                           RMSE_test	= numeric(8),
+                           MAE_test	= numeric(8),
+                           MAPE_test	= numeric(8),
+                           R2_test	= numeric(8))
+
+for(i in 1:25){
+  # Have backup copies of dataset from before permutation
+  dxa_train_male_save = dxa_train_male
+  dxa_test_male_save = dxa_test_male
+  dxa_train_female_save = dxa_train_female
+  dxa_test_female_save = dxa_test_female
+  
+  # Randomly sample order for males
+  new_order = sample(1:(length(c(dxa_train_male[,'ha1q34_9atotal_fat'], dxa_test_male[,'ha1q34_9atotal_fat']))),
+                     length(c(dxa_train_male[,'ha1q34_9atotal_fat'], dxa_test_male[,'ha1q34_9atotal_fat'])))
+  
+  
+  out_vec = c(dxa_train_male[,'ha1q34_9atotal_fat'], dxa_test_male[,'ha1q34_9atotal_fat'])
+  out_vec = out_vec[new_order]
+  
+  dxa_train_male[,'ha1q34_9atotal_fat']  = out_vec[1:nrow(dxa_train_male)]
+  dxa_test_male[,'ha1q34_9atotal_fat']  = out_vec[(nrow(dxa_train_male)+1):length(out_vec)]
+  
+  # Randomly sample order for females
+  new_order = sample(1:(length(c(dxa_train_female[,'ha1q34_9atotal_fat'], dxa_test_female[,'ha1q34_9atotal_fat']))),
+                     length(c(dxa_train_female[,'ha1q34_9atotal_fat'], dxa_test_female[,'ha1q34_9atotal_fat'])))
+  
+  
+  out_vec = c(dxa_train_female[,'ha1q34_9atotal_fat'], dxa_test_female[,'ha1q34_9atotal_fat'])
+  out_vec = out_vec[new_order]
+  
+  dxa_train_female[,'ha1q34_9atotal_fat']  = out_vec[1:nrow(dxa_train_female)]
+  dxa_test_female[,'ha1q34_9atotal_fat']  = out_vec[(nrow(dxa_train_female)+1):length(out_vec)]
+  
+  
+  # Models
+  tot_fat_male_lasso <- make_lasso('ha1q34_9atotal_fat', 'male')
+  tot_fat_male_rf <- make_rf('ha1q34_9atotal_fat', 'male')
+  tot_fat_male_xgb <- make_xgb('ha1q34_9atotal_fat', 'male')
+  tot_fat_female_lasso <- make_lasso('ha1q34_9atotal_fat', 'female')
+  tot_fat_female_rf <- make_rf('ha1q34_9atotal_fat', 'female')
+  tot_fat_female_xgb <- make_xgb('ha1q34_9atotal_fat', 'female')
+  
+  # Performance
+  tfm1 <- train_test_perf(1000*dxa_train_male[,'ha1q37_5ii_tbf_mass'], 
+                          1000*dxa_test_male[,'ha1q37_5ii_tbf_mass'], 
+                          'ha1q34_9atotal_fat', 'male')
+  tfm2 <- train_test_perf(predict_enet(tot_fat_male_lasso, dxa_train_male), 
+                          predict_enet(tot_fat_male_lasso, dxa_test_male),
+                          'ha1q34_9atotal_fat', 'male')
+  tfm3 <- train_test_perf(predict(tot_fat_male_rf, dxa_train_male)$predictions, 
+                          predict(tot_fat_male_rf, dxa_test_male)$predictions,
+                          'ha1q34_9atotal_fat', 'male')
+  tfm4 <- train_test_perf(predict(tot_fat_male_xgb, dxa_train_male), 
+                          predict(tot_fat_male_xgb, dxa_test_male),
+                          'ha1q34_9atotal_fat', 'male')
+  
+  
+  tfm5 <- train_test_perf(1000*dxa_train_female[,'ha1q37_5ii_tbf_mass'], 
+                          1000*dxa_test_female[,'ha1q37_5ii_tbf_mass'], 
+                          'ha1q34_9atotal_fat', 'female')
+  tfm6 <- train_test_perf(predict_enet(tot_fat_female_lasso, dxa_train_female), 
+                          predict_enet(tot_fat_female_lasso, dxa_test_female),
+                          'ha1q34_9atotal_fat', 'female')
+  tfm7 <- train_test_perf(predict(tot_fat_female_rf, dxa_train_female)$predictions, 
+                          predict(tot_fat_female_rf, dxa_test_female)$predictions,
+                          'ha1q34_9atotal_fat', 'female')
+  tfm8 <- train_test_perf(predict(tot_fat_female_xgb, dxa_train_female), 
+                          predict(tot_fat_female_xgb, dxa_test_female),
+                          'ha1q34_9atotal_fat', 'female')
+  
+  totalfatresults <- rbind(tfm1, tfm2, tfm3, tfm4, tfm5, tfm6, tfm7, tfm8)
+  
+  
+  # do this for some idea of SE
+  fat_res_male[i] = totalfatresults[2,6]
+  fat_res_female[i] = totalfatresults[6,6]
+  
+  totalfat_perm = totalfat_perm + totalfatresults
+  
+  # revert datasets to unpermuted version
+  dxa_train_male = dxa_train_male_save
+  dxa_test_male = dxa_test_male_save
+  dxa_train_female = dxa_train_female_save
+  dxa_test_female = dxa_test_female_save
+  
+  print(i)
+}
+
+totalfatresults = totalfat_perm / 25
+
+
+totalfatresults[,1] <- round(totalfatresults[,1]/1000, 2)
+totalfatresults[,2] <- round(totalfatresults[,2]/1000, 3)
+totalfatresults[,3] <- round(totalfatresults[,3]*100, 2)
+totalfatresults[,4] <- round(totalfatresults[,4], 3)
+totalfatresults[,5] <- round(totalfatresults[,5]/1000, 2)
+totalfatresults[,6] <- round(totalfatresults[,6]/1000, 3)
+totalfatresults[,7] <- round(totalfatresults[,7]*100, 2)
+totalfatresults[,8] <- round(totalfatresults[,8], 3)
+
+sd(fat_res_male/1000)
+sd(fat_res_female/1000)
+
+write.csv(totalfatresults, 'totalfatmasslessints_perm3.csv')
+
+
+
+
+# Part 4
+
+
+set.seed(55)
+
+fat_res_male = numeric(25)
+fat_res_female = numeric(25)
+
+totalfat_perm = data.frame(RMSE_train	= numeric(8),
+                           MAE_train	= numeric(8),
+                           MAPE_train	= numeric(8),
+                           R2_train	= numeric(8),
+                           RMSE_test	= numeric(8),
+                           MAE_test	= numeric(8),
+                           MAPE_test	= numeric(8),
+                           R2_test	= numeric(8))
+
+for(i in 1:25){
+  # Have backup copies of dataset from before permutation
+  dxa_train_male_save = dxa_train_male
+  dxa_test_male_save = dxa_test_male
+  dxa_train_female_save = dxa_train_female
+  dxa_test_female_save = dxa_test_female
+  
+  # Randomly sample order for males
+  new_order = sample(1:(length(c(dxa_train_male[,'ha1q34_9atotal_fat'], dxa_test_male[,'ha1q34_9atotal_fat']))),
+                     length(c(dxa_train_male[,'ha1q34_9atotal_fat'], dxa_test_male[,'ha1q34_9atotal_fat'])))
+  
+  
+  out_vec = c(dxa_train_male[,'ha1q34_9atotal_fat'], dxa_test_male[,'ha1q34_9atotal_fat'])
+  out_vec = out_vec[new_order]
+  
+  dxa_train_male[,'ha1q34_9atotal_fat']  = out_vec[1:nrow(dxa_train_male)]
+  dxa_test_male[,'ha1q34_9atotal_fat']  = out_vec[(nrow(dxa_train_male)+1):length(out_vec)]
+  
+  # Randomly sample order for females
+  new_order = sample(1:(length(c(dxa_train_female[,'ha1q34_9atotal_fat'], dxa_test_female[,'ha1q34_9atotal_fat']))),
+                     length(c(dxa_train_female[,'ha1q34_9atotal_fat'], dxa_test_female[,'ha1q34_9atotal_fat'])))
+  
+  
+  out_vec = c(dxa_train_female[,'ha1q34_9atotal_fat'], dxa_test_female[,'ha1q34_9atotal_fat'])
+  out_vec = out_vec[new_order]
+  
+  dxa_train_female[,'ha1q34_9atotal_fat']  = out_vec[1:nrow(dxa_train_female)]
+  dxa_test_female[,'ha1q34_9atotal_fat']  = out_vec[(nrow(dxa_train_female)+1):length(out_vec)]
+  
+  
+  # Models
+  tot_fat_male_lasso <- make_lasso('ha1q34_9atotal_fat', 'male')
+  tot_fat_male_rf <- make_rf('ha1q34_9atotal_fat', 'male')
+  tot_fat_male_xgb <- make_xgb('ha1q34_9atotal_fat', 'male')
+  tot_fat_female_lasso <- make_lasso('ha1q34_9atotal_fat', 'female')
+  tot_fat_female_rf <- make_rf('ha1q34_9atotal_fat', 'female')
+  tot_fat_female_xgb <- make_xgb('ha1q34_9atotal_fat', 'female')
+  
+  # Performance
+  tfm1 <- train_test_perf(1000*dxa_train_male[,'ha1q37_5ii_tbf_mass'], 
+                          1000*dxa_test_male[,'ha1q37_5ii_tbf_mass'], 
+                          'ha1q34_9atotal_fat', 'male')
+  tfm2 <- train_test_perf(predict_enet(tot_fat_male_lasso, dxa_train_male), 
+                          predict_enet(tot_fat_male_lasso, dxa_test_male),
+                          'ha1q34_9atotal_fat', 'male')
+  tfm3 <- train_test_perf(predict(tot_fat_male_rf, dxa_train_male)$predictions, 
+                          predict(tot_fat_male_rf, dxa_test_male)$predictions,
+                          'ha1q34_9atotal_fat', 'male')
+  tfm4 <- train_test_perf(predict(tot_fat_male_xgb, dxa_train_male), 
+                          predict(tot_fat_male_xgb, dxa_test_male),
+                          'ha1q34_9atotal_fat', 'male')
+  
+  
+  tfm5 <- train_test_perf(1000*dxa_train_female[,'ha1q37_5ii_tbf_mass'], 
+                          1000*dxa_test_female[,'ha1q37_5ii_tbf_mass'], 
+                          'ha1q34_9atotal_fat', 'female')
+  tfm6 <- train_test_perf(predict_enet(tot_fat_female_lasso, dxa_train_female), 
+                          predict_enet(tot_fat_female_lasso, dxa_test_female),
+                          'ha1q34_9atotal_fat', 'female')
+  tfm7 <- train_test_perf(predict(tot_fat_female_rf, dxa_train_female)$predictions, 
+                          predict(tot_fat_female_rf, dxa_test_female)$predictions,
+                          'ha1q34_9atotal_fat', 'female')
+  tfm8 <- train_test_perf(predict(tot_fat_female_xgb, dxa_train_female), 
+                          predict(tot_fat_female_xgb, dxa_test_female),
+                          'ha1q34_9atotal_fat', 'female')
+  
+  totalfatresults <- rbind(tfm1, tfm2, tfm3, tfm4, tfm5, tfm6, tfm7, tfm8)
+  
+  
+  # do this for some idea of SE
+  fat_res_male[i] = totalfatresults[2,6]
+  fat_res_female[i] = totalfatresults[6,6]
+  
+  totalfat_perm = totalfat_perm + totalfatresults
+  
+  # revert datasets to unpermuted version
+  dxa_train_male = dxa_train_male_save
+  dxa_test_male = dxa_test_male_save
+  dxa_train_female = dxa_train_female_save
+  dxa_test_female = dxa_test_female_save
+  
+  print(i)
+}
+
+totalfatresults = totalfat_perm / 25
+
+
+totalfatresults[,1] <- round(totalfatresults[,1]/1000, 2)
+totalfatresults[,2] <- round(totalfatresults[,2]/1000, 3)
+totalfatresults[,3] <- round(totalfatresults[,3]*100, 2)
+totalfatresults[,4] <- round(totalfatresults[,4], 3)
+totalfatresults[,5] <- round(totalfatresults[,5]/1000, 2)
+totalfatresults[,6] <- round(totalfatresults[,6]/1000, 3)
+totalfatresults[,7] <- round(totalfatresults[,7]*100, 2)
+totalfatresults[,8] <- round(totalfatresults[,8], 3)
+
+sd(fat_res_male/1000)
+sd(fat_res_female/1000)
+
+write.csv(totalfatresults, 'totalfatmasslessints_perm4.csv')
+
 
 
 # Outcome = Total body lean mass, ha1q34_9btotal_lean
