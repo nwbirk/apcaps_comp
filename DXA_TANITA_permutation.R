@@ -1087,6 +1087,16 @@ sd(fat_res_female/1000)
 write.csv(totalfatresults, 'totalfatmasslessints_perm4.csv')
 
 
+# Read in the 4 different permutation results:
+perm1 <- read.csv("~/totalfatmasslessints_perm.csv")
+perm2 <- read.csv("~/totalfatmasslessints_perm2.csv")
+perm3 <- read.csv("~/totalfatmasslessints_perm3.csv")
+perm4 <- read.csv("~/totalfatmasslessints_perm4.csv")
+
+perm_all = perm1+perm2+perm3+perm4
+perm_all = perm_all/4
+write.csv(perm_all, "totalfatmasslessints_perm_comb.csv")
+
 
 # Outcome = Total body lean mass, ha1q34_9btotal_lean
 
