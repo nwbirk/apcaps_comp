@@ -1065,7 +1065,7 @@ jpeg("trunkfatmale.jpg", width = 660, height = "411")
 grid.arrange(p1, p3, ncol = 2)
 dev.off()
 
-jpeg("totalfatfemale.jpg", width = 660, height = "411")
+jpeg("trunkfatfemale.jpg", width = 660, height = "411")
 grid.arrange(p2, p4, ncol = 2)
 dev.off()
 
