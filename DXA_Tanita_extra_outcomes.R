@@ -17,8 +17,8 @@ library(gridExtra)
 
 
 # Import data
-wave3 <- read.dta13('./3FU_for share_Nick.dta')
-wave3_plus <- read.dta13('./extract_forNick_070721.dta')
+wave3 <- read.dta13('~/Downloads/3FU_for share_Nick.dta')
+wave3_plus <- read.dta13('~/Downloads/extract_forNick_070721.dta')
 
 wave3 <- left_join(wave3, wave3_plus, by = 'ha1id')
 

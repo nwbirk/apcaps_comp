@@ -598,6 +598,12 @@ predict_enet <- function(model, dataset){
 # FIT MODELS AND GET RESULTS
 ############################
 
+# Get age info
+table(dxa_train_male$ha1dv_age < 40)
+table(dxa_train_female$ha1dv_age < 40)
+table(dxa_test_male$ha1dv_age < 40)
+table(dxa_test_female$ha1dv_age < 40)
+
 # Outcome = Total body fat mass
 
 # Models
