@@ -647,18 +647,36 @@ totalfatresults <- rbind(tfm1, tfm2, tfm3, tfm4, tfm5, tfm6, tfm7, tfm8)
 # plots
 p1 = blandr.draw(predict_enet(tot_fat_male_lasso, dxa_test_male), 
                  dxa_test_male[,'ha1q34_9atotal_fat'], lowest_y_axis = -10000, highest_y_axis = 10000,
-                 plotTitle = "Total fat mass (g), male, Full LASSO", ciShading = FALSE, ciDisplay = FALSE) + geom_smooth(method = "lm")
+                 ciShading = FALSE, ciDisplay = FALSE) + geom_smooth(method = "lm") + 
+  ggtitle("Total fat mass (g), male,\nFull LASSO") + 
+  theme(axis.title = element_text(size = 16),
+                                                                                                                                                axis.text = element_text(size = 12),
+                                                                                                                                                plot.title = element_text(size = 18))
 p2 = blandr.draw(predict_enet(tot_fat_female_lasso, dxa_test_female), 
                  dxa_test_female[,'ha1q34_9atotal_fat'], lowest_y_axis = -10000, highest_y_axis = 10000,
-                 plotTitle = "Total fat mass (g), female, Full LASSO", ciShading = FALSE, ciDisplay = FALSE) + geom_smooth(method = "lm")
+                 ciShading = FALSE, ciDisplay = FALSE) + geom_smooth(method = "lm") + 
+  ggtitle("Total fat mass (g), female,\nFull LASSO") + 
+  theme(axis.title = element_text(size = 16),
+                                                                                                                                                  axis.text = element_text(size = 12),
+                                                                                                                                                  plot.title = element_text(size = 18))
 
 
 p3 = blandr.draw(1000*dxa_test_male[,'ha1q37_5ii_tbf_mass'], 
                  dxa_test_male[,'ha1q34_9atotal_fat'], lowest_y_axis = -10000, highest_y_axis = 10000,
-                 plotTitle = "Total fat mass (g), male, Tanita", ciShading = FALSE, ciDisplay = FALSE) + geom_smooth(method = "lm")
+                 ciShading = FALSE, ciDisplay = FALSE) + 
+  geom_smooth(method = "lm") + 
+  ggtitle("Total fat mass (g), male,\nTanita") + 
+  theme(axis.title = element_text(size = 16),
+                                                                                                                                            axis.text = element_text(size = 12),
+                                                                                                                                            plot.title = element_text(size = 18))
 p4 = blandr.draw(1000*dxa_test_female[,'ha1q37_5ii_tbf_mass'], 
                  dxa_test_female[,'ha1q34_9atotal_fat'], lowest_y_axis = -10000, highest_y_axis = 10000,
-                 plotTitle = "Total fat mass (g), female, Tanita", ciShading = FALSE, ciDisplay = FALSE) + geom_smooth(method = "lm")
+                 ciShading = FALSE, ciDisplay = FALSE) + 
+  geom_smooth(method = "lm") + 
+  ggtitle("Total fat mass (g), female,\nTanita") + 
+  theme(axis.title = element_text(size = 16),
+                                                                                                                                              axis.text = element_text(size = 12),
+                                                                                                                                              plot.title = element_text(size = 18))
 
 # Display / save
 jpeg("totalfatmale.jpg", width = 660, height = "411")
@@ -777,18 +795,38 @@ t.test(predict_enet(tot_lean_female_lasso, dxa_test_female), dxa_test_female$ha1
 # plots
 p1 = blandr.draw(predict_enet(tot_lean_male_lasso, dxa_test_male), 
                  dxa_test_male[,'ha1q34_9btotal_lean'],
-                 plotTitle = "Total lean mass (g), male, Full LASSO", ciShading = FALSE, ciDisplay = FALSE) + geom_smooth(method = "lm")
+                 ciShading = FALSE, ciDisplay = FALSE) + 
+  geom_smooth(method = "lm") + 
+  ggtitle("Total lean mass (g), male,\nFull LASSO") + 
+  theme(axis.title = element_text(size = 16),
+                                                                                                                                                 axis.text = element_text(size = 12),
+                                                                                                                                                 plot.title = element_text(size = 18))
 p2 = blandr.draw(predict_enet(tot_lean_female_lasso, dxa_test_female), 
                  dxa_test_female[,'ha1q34_9btotal_lean'],
-                 plotTitle = "Total lean mass (g), female, Full LASSO", ciShading = FALSE, ciDisplay = FALSE) + geom_smooth(method = "lm")
+                 ciShading = FALSE, ciDisplay = FALSE) + 
+  geom_smooth(method = "lm") + 
+  ggtitle("Total lean mass (g), female,\nFull LASSO") + 
+  theme(axis.title = element_text(size = 16),
+                                                                                                                                                   axis.text = element_text(size = 12),
+                                                                                                                                                   plot.title = element_text(size = 18))
 
 
 p3 = blandr.draw(1000*dxa_test_male[,'ha1q37_5iii_tbf_free_mass'], 
                  dxa_test_male[,'ha1q34_9btotal_lean'],
-                 plotTitle = "Total lean mass (g), male, Tanita", ciShading = FALSE, ciDisplay = FALSE) + geom_smooth(method = "lm")
+                 ciShading = FALSE, ciDisplay = FALSE) + 
+  geom_smooth(method = "lm") + 
+  ggtitle("Total lean mass (g), male,\nTanita") + 
+  theme(axis.title = element_text(size = 16),
+                                                                                                                                             axis.text = element_text(size = 12),
+                                                                                                                                             plot.title = element_text(size = 18))
 p4 = blandr.draw(1000*dxa_test_female[,'ha1q37_5iii_tbf_free_mass'], 
                  dxa_test_female[,'ha1q34_9btotal_lean'],
-                 plotTitle = "Total lean mass (g), female, Tanita", ciShading = FALSE, ciDisplay = FALSE) + geom_smooth(method = "lm")
+                 ciShading = FALSE, ciDisplay = FALSE) + 
+  geom_smooth(method = "lm") + 
+  ggtitle("Total lean mass (g), female,\nTanita") + 
+  theme(axis.title = element_text(size = 16),
+                                                                                                                                               axis.text = element_text(size = 12),
+                                                                                                                                               plot.title = element_text(size = 18))
 
 
 # Display 
@@ -926,18 +964,38 @@ totalfatpresults <- rbind(tfp1, tfp2, tfp3, tfp4, tfp5, tfp6, tfp7, tfp8)
 # plots
 p1 = blandr.draw(predict_enet(tot_p_male_lasso, dxa_test_male), 
                  dxa_test_male[,'ha1q34_9dtotal_pcent_fat'],
-                 plotTitle = "Total fat %, male, Full LASSO", ciShading = FALSE, ciDisplay = FALSE) + geom_smooth(method = "lm")
+                 ciShading = FALSE, ciDisplay = FALSE) + 
+  geom_smooth(method = "lm") + 
+  ggtitle("Total fat %, male,\nFull LASSO") + 
+  theme(axis.title = element_text(size = 16),
+                                                                                                                                         axis.text = element_text(size = 12),
+                                                                                                                                         plot.title = element_text(size = 18))
 p2 = blandr.draw(predict_enet(tot_p_female_lasso, dxa_test_female), 
                  dxa_test_female[,'ha1q34_9dtotal_pcent_fat'],
-                 plotTitle = "Total fat %, female, Full LASSO", ciShading = FALSE, ciDisplay = FALSE) + geom_smooth(method = "lm")
+                 ciShading = FALSE, ciDisplay = FALSE) + 
+  geom_smooth(method = "lm")+ 
+  ggtitle("Total fat %, female,\nFull LASSO") + 
+  theme(axis.title = element_text(size = 16),
+                                                                                                                                          axis.text = element_text(size = 12),
+                                                                                                                                          plot.title = element_text(size = 18))
 
 
 p3 = blandr.draw(dxa_test_male[,'ha1q37_5i_tbf_pcent'], 
                  dxa_test_male[,'ha1q34_9dtotal_pcent_fat'],
-                 plotTitle = "Total fat %, male, Tanita", ciShading = FALSE, ciDisplay = FALSE) + geom_smooth(method = "lm")
+                 ciShading = FALSE, ciDisplay = FALSE) + 
+  geom_smooth(method = "lm")+ 
+  ggtitle("Total fat %, male,\nTanita") + 
+  theme(axis.title = element_text(size = 16),
+                                                                                                                                    axis.text = element_text(size = 12),
+                                                                                                                                    plot.title = element_text(size = 18))
 p4 = blandr.draw(dxa_test_female[,'ha1q37_5i_tbf_pcent'], 
                  dxa_test_female[,'ha1q34_9dtotal_pcent_fat'],
-                 plotTitle = "Total fat %, female, Tanita", ciShading = FALSE, ciDisplay = FALSE) + geom_smooth(method = "lm")
+                 ciShading = FALSE, ciDisplay = FALSE) + 
+  geom_smooth(method = "lm")+ 
+  ggtitle("Total fat %, female,\nTanita") + 
+  theme(axis.title = element_text(size = 16),
+                                                                                                                                      axis.text = element_text(size = 12),
+                                                                                                                                      plot.title = element_text(size = 18))
 
 
 # Display 
@@ -1050,18 +1108,38 @@ trp8 <- train_test_perf(predict(trunk_fat_female_xgb, dxa_train_female),
 # Plots
 p1 = blandr.draw(predict_enet(trunk_fat_male_lasso, dxa_test_male), 
                  dxa_test_male[,'ha1q34_6dtrunk_pcent_fat'],
-                 plotTitle = "Trunk fat %, male, Full LASSO", ciShading = FALSE, ciDisplay = FALSE) + geom_smooth(method = "lm")
+                 ciShading = FALSE, ciDisplay = FALSE) + 
+  geom_smooth(method = "lm")+ 
+  ggtitle("Trunk fat %, male,\nFull LASSO") + 
+  theme(axis.title = element_text(size = 16),
+                                                                                                                                        axis.text = element_text(size = 12),
+                                                                                                                                        plot.title = element_text(size = 18))
 p2 = blandr.draw(predict_enet(trunk_fat_female_lasso, dxa_test_female), 
                  dxa_test_female[,'ha1q34_6dtrunk_pcent_fat'],
-                 plotTitle = "Trunk fat %, female, Full LASSO", ciShading = FALSE, ciDisplay = FALSE) + geom_smooth(method = "lm")
+                 ciShading = FALSE, ciDisplay = FALSE) + 
+  geom_smooth(method = "lm")+ 
+  ggtitle("Trunk fat %, female,\nFull LASSO") + 
+  theme(axis.title = element_text(size = 16),
+                                                                                                                                          axis.text = element_text(size = 12),
+                                                                                                                                          plot.title = element_text(size = 18))
 
 
 p3 = blandr.draw(dxa_test_male[,'ha1q37_11i_seg_tr_pcent'], 
                  dxa_test_male[,'ha1q34_6dtrunk_pcent_fat'],
-                 plotTitle = "Trunk fat %, male, Tanita", ciShading = FALSE, ciDisplay = FALSE) + geom_smooth(method = "lm")
+                 ciShading = FALSE, ciDisplay = FALSE) + 
+  geom_smooth(method = "lm")+ 
+  ggtitle("Trunk fat %, male,\nTanita") + 
+  theme(axis.title = element_text(size = 16),
+                                                                                                                                    axis.text = element_text(size = 12),
+                                                                                                                                    plot.title = element_text(size = 18))
 p4 = blandr.draw(dxa_test_female[,'ha1q37_11i_seg_tr_pcent'], 
                  dxa_test_female[,'ha1q34_6dtrunk_pcent_fat'],
-                 plotTitle = "Trunk fat %, female, Tanita", ciShading = FALSE, ciDisplay = FALSE) + geom_smooth(method = "lm")
+                 ciShading = FALSE, ciDisplay = FALSE) + 
+  geom_smooth(method = "lm")+ 
+  ggtitle("Trunk fat %, female,\nTanita") + 
+  theme(axis.title = element_text(size = 16),
+                                                                                                                                      axis.text = element_text(size = 12),
+                                                                                                                                      plot.title = element_text(size = 18))
 
 trunkpercent <- rbind(trp1, trp2, trp3, trp4, trp5, trp6, trp7, trp8)
 
@@ -1181,18 +1259,38 @@ l1results <- rbind(l11, l12, l13, l14, l15, l16, l17, l18)
 # Plots
 p1 = blandr.draw(predict_enet(l1_fat_male_lasso, dxa_test_male), 
                  dxa_test_male[,'ha1q34_12dl1l4_pcent1'],
-                 plotTitle = "L1-L4 fat %, male, Full LASSO", ciShading = FALSE, ciDisplay = FALSE) + geom_smooth(method = "lm")
+                 ciShading = FALSE, ciDisplay = FALSE) + 
+  geom_smooth(method = "lm")+ 
+  ggtitle("L1-L4 fat %, male,\nFull LASSO") + 
+  theme(axis.title = element_text(size = 16),
+                                                                                                                                        axis.text = element_text(size = 12),
+                                                                                                                                        plot.title = element_text(size = 18))
 p2 = blandr.draw(predict_enet(l1_fat_female_lasso, dxa_test_female), 
                  dxa_test_female[,'ha1q34_12dl1l4_pcent1'],
-                 plotTitle = "L1-L4 fat %, female, Full LASSO", ciShading = FALSE, ciDisplay = FALSE) + geom_smooth(method = "lm")
+                 ciShading = FALSE, ciDisplay = FALSE) + 
+  geom_smooth(method = "lm")+ 
+  ggtitle("L1-L4 fat %, female,\nFull LASSO") + 
+  theme(axis.title = element_text(size = 16),
+                                                                                                                                          axis.text = element_text(size = 12),
+                                                                                                                                          plot.title = element_text(size = 18))
 
 
 p3 = blandr.draw(dxa_test_male[,'ha1q37_11i_seg_tr_pcent'],
                  dxa_test_male[,'ha1q34_12dl1l4_pcent1'],
-                 plotTitle = "L1-L4 fat %, male, Tanita", ciShading = FALSE, ciDisplay = FALSE) + geom_smooth(method = "lm")
+                 ciShading = FALSE, ciDisplay = FALSE) + 
+  geom_smooth(method = "lm")+ 
+  ggtitle("L1-L4 fat %, male,\nTanita") + 
+  theme(axis.title = element_text(size = 16),
+                                                                                                                                    axis.text = element_text(size = 12),
+                                                                                                                                    plot.title = element_text(size = 18))
 p4 = blandr.draw(dxa_test_female[,'ha1q37_11i_seg_tr_pcent'],
                  dxa_test_female[,'ha1q34_12dl1l4_pcent1'],
-                 plotTitle = "L1-L4 fat %, female, Tanita", ciShading = FALSE, ciDisplay = FALSE) + geom_smooth(method = "lm")
+                 ciShading = FALSE, ciDisplay = FALSE) + 
+  geom_smooth(method = "lm")+ 
+  ggtitle("L1-L4 fat %, female,\nTanita") + 
+  theme(axis.title = element_text(size = 16),
+                                                                                                                                      axis.text = element_text(size = 12),
+                                                                                                                                      plot.title = element_text(size = 18))
 
 
 # Display 
@@ -1323,18 +1421,38 @@ apresults <- rbind(ap1, ap2, ap3, ap4, ap5,
 # Plots
 p1 = blandr.draw(predict_enet(app_lean_male_lasso, dxa_test_male), 
                  dxa_test_male[,'appendic_lean'],
-                 plotTitle = "Appendicular lean mass (g), male, Full LASSO", ciShading = FALSE, ciDisplay = FALSE) + geom_smooth(method = "lm")
+                 ciShading = FALSE, ciDisplay = FALSE) + 
+  geom_smooth(method = "lm")+ 
+  ggtitle("Appendicular lean mass (g), male,\nFull LASSO") + 
+  theme(axis.title = element_text(size = 16),
+                                                                                                                                                       axis.text = element_text(size = 12),
+                                                                                                                                                       plot.title = element_text(size = 18))
 p2 = blandr.draw(predict_enet(app_lean_female_lasso, dxa_test_female), 
                  dxa_test_female[,'appendic_lean'],
-                 plotTitle = "Appendicular lean mass (g), female, Full LASSO", ciShading = FALSE, ciDisplay = FALSE) + geom_smooth(method = "lm")
+                 ciShading = FALSE, ciDisplay = FALSE) + 
+  geom_smooth(method = "lm")+ 
+  ggtitle("Appendicular lean mass (g), female,\nFull LASSO") + 
+  theme(axis.title = element_text(size = 16),
+                                                                                                                                                         axis.text = element_text(size = 12),
+                                                                                                                                                         plot.title = element_text(size = 18))
 
 
 p3 = blandr.draw(1000*dxa_test_male[,'ha1q37_7iii_seg_rl_free_mass'] + 1000*dxa_test_male[,'ha1q37_8iii_seg_ll_free_mass'] + 1000*dxa_test_male[,'ha1q37_9iii_seg_ra_free_mass'] + 1000*dxa_test_male[,'ha1q37_10iii_seg_la_free_mass'], 
                  dxa_test_male[,'appendic_lean'],
-                 plotTitle = "Appendicular lean mass (g), male, Tanita", ciShading = FALSE, ciDisplay = FALSE) + geom_smooth(method = "lm")
+                 ciShading = FALSE, ciDisplay = FALSE) + 
+  geom_smooth(method = "lm")+ 
+  ggtitle("Appendicular lean mass (g), male,\nTanita") + 
+  theme(axis.title = element_text(size = 16),
+                                                                                                                                                   axis.text = element_text(size = 12),
+                                                                                                                                                   plot.title = element_text(size = 18))
 p4 = blandr.draw(1000*dxa_test_female[,'ha1q37_7iii_seg_rl_free_mass'] + 1000*dxa_test_female[,'ha1q37_8iii_seg_ll_free_mass'] + 1000*dxa_test_female[,'ha1q37_9iii_seg_ra_free_mass'] + 1000*dxa_test_female[,'ha1q37_10iii_seg_la_free_mass'], 
                  dxa_test_female[,'appendic_lean'],
-                 plotTitle = "Appendicular lean mass (g), female, Tanita", ciShading = FALSE, ciDisplay = FALSE) + geom_smooth(method = "lm")
+                  ciShading = FALSE, ciDisplay = FALSE) + 
+  geom_smooth(method = "lm")+ 
+  ggtitle("Appendicular lean mass (g), female,\nTanita") + 
+  theme(axis.title = element_text(size = 16),
+                                                                                                                                                     axis.text = element_text(size = 12),
+                                                                                                                                                     plot.title = element_text(size = 18))
 
 # Display 
 jpeg("apfatmale.jpg", width = 660, height = "411")
